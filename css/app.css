@@ -27,7 +27,7 @@ html {
 }
 body {
   font-family: var(--fontGeneral);
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   line-height: 1.2;
   margin-bottom: 8rem;
 }
@@ -389,7 +389,7 @@ footer a {
  cursor: pointer;
 }
 .init-state {
-  width: 2rem;
+  width: 1.6rem;
   margin: 0 0 0 .3rem;
   background-size: contain;
   background-repeat: no-repeat;
@@ -565,13 +565,14 @@ footer a {
   align-items: first baseline;
 }
 .form-textinput-text {
-  width: 15rem;
+  width: 50%;
   padding: 0 .5rem;
-  margin: .5rem;
+  margin: 0 .5rem;
   text-align: right;
   border-bottom: .2rem solid var(--colorPri); 
 }
 .form-textinput-input {
+  width: 50%;
   padding: .5rem 1rem;
   margin: .5rem auto;
   border: .2rem solid var(--colorPri);
@@ -585,11 +586,11 @@ footer a {
   resize: none;
   min-height: 6rem;
   overflow: hidden;
-  width: 16rem;
+  width: 50%;
 }
 @media (max-width: 750px) {
   .form-textinput-memo{
-    width: 13rem;
+    width: 50%;
   }
 }
 .form-button-group {
@@ -620,7 +621,7 @@ footer a {
   background: radial-gradient(var(--colorPri) 30%, var(--colorSec) 60% ,var(--colorSec));
 }
 .form-label-checkbox {
-  width: 13rem;
+  width: 45%;
   padding: 0;
   margin: .5rem;
   text-align: right;
