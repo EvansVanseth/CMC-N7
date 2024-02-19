@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">    
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="shortcut icon" href="img/favicon.svg" type="image/svg">
+  <script src="js/app.js"></script>
+
+  <title>CMC-N7</title>
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header-in contenedor">
+      <h1 class="app-title">Chaos Manager <span class="app-title-in">in</span> Combat</h1>
+      <img class="app-logo" alt="logo de la aplicacion"
+          src="img/app-logo.png">
+    </div>
+  </header>
+  <main>
+    <!-- Listado de combatientes -->
+    <div class="app-mark contenedor">
+      <div class="mark-header">
+        <div class="mark-group">
+          <h3 class="mark-title fighters-title" onclick="toggleFightersPanel()">COMBATIENTES</h3>
+          <img class="mark-icon" alt="fighters-logo" src="img/espada-flecha.png">
+          <button class="btn mark-btn" id="btn-add-fighter">NUEVO</button>
+        </div>
+      </div>
+      <div class="panel-fighters" id="fighters-list">
+        <!-- Aqui escribe javascript -->
+      </div>
+    </div>
+    <!-- Listado de iniciativa -->
+    <div class="app-mark contenedor">
+      <div class="mark-header">
+        <div class="mark-group">
+          <h3 class="mark-title">TURNO DE INICIATIVA...</h3>
+          <img class="mark-icon" id="id-logo-dado" alt="fighters-logo" src="img/dado-iniciativa.png">  
+        </div>
+        <div class="mark-group">
+          <h4 class="turn-number">TURNO: <span id="num-turno"></span></h4>
+          <button class="btn next-turn-btn" id="btn-next-turn">INICIAR</button>
+        </div>
+      </div>
+      <div class="panel-initiative-stats">
+        <div class="panel-initiative" id="initiative-list">
+          <!-- Aqui escrive javascript -->
+        </div>
+        <div class="panel-stats" >
+          <h4 class="stats-title">ESTADOS</h4>
+          <div class="stats-info" id="stats-data">
+            <!-- Aqui escrive javascript -->
+          </div>
+        </div>
+      </div> 
+    </div>
+    <!-- Listado de vidas -->
+    <div class="app-mark contenedor">
+      <div class="mark-header">
+        <div class="mark-group">
+          <h3 class="mark-title">CONTROL DE DAÑOS</h3>
+          <img class="mark-icon" alt="fighters-logo" src="img/pocion-danos.png">
+        </div>
+      </div>
+      <div class="panel-life" id="life-list">
+        <!-- Aqui escrive javascript -->
+      </div>
+    </div>
+    <div class="app-mark contenedor">
+      <div class="mark-header">
+        <div class="mark-group">
+          <h3 class="mark-title">OPCIONES</h3>
+          <img class="mark-icon" alt="fighters-logo" src="img/icons/setup.svg">
+        </div>
+      </div>
+      <div class="panel-options">
+        <div class="mark-group">
+          <button class="btn mark-opt-btn" id="btn-new-combat">NUEVO COMBATE</button>
+          <button class="btn mark-opt-btn" id="btn-clear-combat">REINICIAR COMBATE</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <p>Designed and programmed by<a href="https://github.com/EvansVanseth" target="_blank" >EvansVanseth</a></p>
+  </footer>
+</body>
+</html>
