@@ -78,6 +78,9 @@ function loadLocal(){
     newFighter.iNumRep = element.iNumRep;
     newFighter.iPG = element.iPG;
     newFighter.iLife = element.iLife;
+    newFighter.iSH = element.iSH;
+    newFighter.iShld = element.iShld;
+    newFighter.iRS = element.iRS;
     newFighter.iDesEmpInit = element.iDesEmpInit;
     newFighter.iControlInit = element.iControlInit;
     element.states.forEach(eleState => {
@@ -108,6 +111,8 @@ function updateTurn(){
   } else {
     htmlNumTurno.innerHTML = `${TurnControl.turno}`;
   }
+  showFighters();
+  showLife();
   showInitiative();
 };
 function findNextFighter(){
@@ -115,9 +120,6 @@ function findNextFighter(){
     let fighterFind = "";
     console.log(FightersList.length);
     if(FightersList.length>0) {
-      if(TurnControl.fighterName !== "") {
-        getFighterByName(TurnControl.fighterName).statesPassTurn();
-      }
       htmlBtnTurno.innerHTML = "SIGUIENTE";
       if(TurnControl.mode===0) {
         TurnControl.mode = 1;
@@ -137,6 +139,7 @@ function findNextFighter(){
             }
           } while (fighterFind==="");
           TurnControl.fighterName = fighterFind;
+          getFighterByName(fighterFind).startTurn();
           if (getFighterByName(fighterFind).checkStates()) nextFighter();
       }
       updateTurn();
@@ -379,7 +382,9 @@ class fighter {
                sInit,
                bPje,
                iNumRep,
-               iPG
+               iPG,
+               iSH,
+               iRS
                ) {
     this.sName = sName;
     this.iInit_bon = 0;
@@ -390,6 +395,9 @@ class fighter {
     this.iNumRep = iNumRep;
     this.iPG = iPG;
     this.iLife = iPG;
+    this.iSH = iSH;
+    this.iShld = iSH;
+    this.iRS = iRS
     this.iDesEmpInit = (bPje?999:Math.floor(Math.random()*1000));
     this.iControlInit = 0;
     this.states = new Array();
@@ -528,6 +536,7 @@ class fighter {
     if(this.bPje) return;
     const divF = document.createElement("div");
     divF.classList.add(`life-fighter`);
+    /* Life */
     if (this.iLife > this.iPG) divF.classList.add("life-100");
     else if (this.iLife / this.iPG > 0.85) divF.classList.add("life-90");
     else if (this.iLife / this.iPG > 0.55) divF.classList.add("life-70");
@@ -535,15 +544,29 @@ class fighter {
     else if (this.iLife / this.iPG > 0.1) divF.classList.add("life-25");
     else if (this.iLife / this.iPG > 0) divF.classList.add("life-5");
     else divF.classList.add("life-0");
+    /* Shields */
+    if (this.iShld / this.iSH > 0.85) divF.classList.add("shld-90");
+    else if (this.iShld / this.iSH > 0.55) divF.classList.add("shld-70");
+    else if (this.iShld / this.iSH > 0.35) divF.classList.add("shld-45");
+    else if (this.iShld / this.iSH > 0.1) divF.classList.add("shld-25");
+    else if (this.iShld / this.iSH > 0) divF.classList.add("shld-5");
+    else divF.classList.add("shld-0");    
     const divN = document.createElement("div");
     divN.classList.add(`life-name`);
     divN.innerHTML = this.sFullName();
     const divL = document.createElement("div");
     divL.classList.add(`life-value`);
-    divL.innerHTML = `${this.iLife}`;
+    if (this.iShld > 0) {
+      divL.innerHTML = `${this.iShld}`;
+      divF.classList.add(`life-shld`);
+    }
+    else divL.innerHTML = `${this.iLife}`;
     const divT = document.createElement("div");
     divT.classList.add(`life-total`);
-    divT.innerHTML = `${this.iPG}`;
+    if (this.iShld > 0) {
+      divT.innerHTML = `${this.iSH}`;
+    }
+    else divT.innerHTML = `${this.iPG}`;
     const btUp = document.createElement("button");
     btUp.classList.add(`life-btn`);
     btUp.innerHTML = "+";
@@ -570,11 +593,13 @@ class fighter {
     })
     return bInc;
   }
-  statesPassTurn(){
+  startTurn(){
     this.states.forEach((s) => {
       s.iTurnos--;
     })
     this.states = this.states.filter(s => s.iTurnos>0);
+    this.iShld += this.iRS;
+    this.iShld = Math.min(this.iShld, this.iSH);
   }
 
 };
@@ -644,17 +669,23 @@ function posLifeFighterByName(sTestName) {
   }
   return -1;
 };
-function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG){
+function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG, sSH, sRS){
   if(sNombre === "") return;
   if (sPG === "") sPG = "0";
+  if (sSH === "") sSH = "0";
+  if (sRS === "") sRS = "0";
   let iPG = parseInt(sPG);
+  let iSH = parseInt(sSH);
+  let iRS = parseInt(sRS);
   if (existsFighterByName(sNombre)) return;
   const newFighter = new fighter(sNombre, 
                                  sBonoInic, 
                                  sIniciativa, 
                                  bJugador, 
                                  getLastFighterByName(sNombre), 
-                                 iPG);
+                                 iPG,
+                                 iSH,
+                                 iRS);
   if (bTiradaAuto) newFighter.setInit(Math.floor(Math.random()*20)+1+newFighter.iInit_bon);
   FightersList.push(newFighter);
   InitiativeList.push(newFighter);
@@ -687,15 +718,22 @@ function deleteFighter(oFighter){
 };
 function dealFighter(oFighter, sDano){
   if (sDano==="") sDano="0";
-  oFighter.iLife -= parseInt(sDano);
+  if(oFighter.iShld > 0) {
+    oFighter.iShld -= parseInt(sDano);
+    oFighter.iShld = Math.max(0, oFighter.iShld); 
+  }
+  else oFighter.iLife -= parseInt(sDano);
   showLife();
   showInitiative();
   saveLocal();
 };
 function healFighter(oFighter, sDano){
   if (sDano==="") sDano="0";
-  oFighter.iLife += parseInt(sDano);
-  showLife();
+  if(oFighter.iShld > 0) {
+    oFighter.iShld += parseInt(sDano);
+    oFighter.iShld = Math.min(oFighter.iSH, oFighter.iShld); 
+  }
+  else oFighter.iLife += parseInt(sDano);  showLife();
   showInitiative();
   saveLocal();
 };
@@ -858,6 +896,8 @@ function formNewFighter(){
   const iBono = formTextInput("Bonificador de iniciativa","id-bono-iniciativa",true);
   const iInit = formTextInput("Tirada de iniciativa","id-tira-iniciativa",true);
   const iPtGP = formTextInput("Puntos de golpe (PG)","id-puntos-golpe",true);
+  const iPtSH = formTextInput("Puntos de escudos (SH)","id-puntos-escudos",true);
+  const iPtRS = formTextInput("Recuperación de escudos (RS)","id-recupera-escudos",true);
   const iChbxJ = formCheckBox("Jugador", "chbxJugador");
   const iChbxT = formCheckBox("Tirada automatica", "chbxTiradaAuto");
   const divB = formButtons(1, ["AÑADIR"], [
@@ -866,7 +906,9 @@ function formNewFighter(){
                        iBono[2].value, 
                        iInit[2].value, 
                        iChbxT[1].checked, 
-                       iPtGP[2].value); }
+                       iPtGP[2].value,
+                       iPtSH[2].value,
+                       iPtRS[2].value );}
   ]);
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
@@ -874,8 +916,8 @@ function formNewFighter(){
   // LOGICA
   iInit[2].disabled = true;
   iChbxT[1].checked = true;
-  iChbxJ[1].addEventListener("click", ()=>{ changeCheckBox(iChbxJ[1], iChbxT[1], [iInit[2]], [iPtGP[2]])} );
-  iChbxJ[2].addEventListener("click", ()=>{ changeCheckBox(iChbxJ[1], iChbxT[1], [iInit[2]], [iPtGP[2]])} );
+  iChbxJ[1].addEventListener("click", ()=>{ changeCheckBox(iChbxJ[1], iChbxT[1], [iInit[2]], [iPtGP[2], iPtSH[2], iPtRS[2]])} );
+  iChbxJ[2].addEventListener("click", ()=>{ changeCheckBox(iChbxJ[1], iChbxT[1], [iInit[2]], [iPtGP[2], iPtSH[2], iPtRS[2]])} );
   iChbxT[1].addEventListener("click", ()=>{ changeCheckBox(iChbxT[1], undefined, [], [iInit[2]])} );
   iChbxT[2].addEventListener("click", ()=>{ changeCheckBox(iChbxT[1], undefined, [], [iInit[2]])} );
   
@@ -886,6 +928,8 @@ function formNewFighter(){
   divOpac[1].appendChild(iBono[0]);
   divOpac[1].appendChild(iInit[0]);
   divOpac[1].appendChild(iPtGP[0]);
+  divOpac[1].appendChild(iPtSH[0]);
+  divOpac[1].appendChild(iPtRS[0]);
   divOpac[1].appendChild(iChbxT[0]);
   divOpac[1].appendChild(divB[0]);
   HTMLMain.appendChild(divOpac[0]);
@@ -943,7 +987,7 @@ function formDealFighter(oFighter){
   // VISUAL
   const pTit = formTitle(`Dañar a ${oFighter.sFullName()}`);
   pTit[2].addEventListener("click", ()=>{ divOpac[0].remove(); });
-  const iDano = formTextInput("Daño causado ( - )","id-dano",true);
+  const iDano = formTextInput("Daño causado (-)","id-dano",true);
 
   const divB = formButtons(1, ["ACEPTAR"], [
     ()=>{ divOpac[0].remove(); dealFighter(oFighter, iDano[2].value); }
@@ -963,7 +1007,7 @@ function formHealFighter(oFighter){
   // VISUAL
   const pTit = formTitle(`Sanar a ${oFighter.sFullName()}`);
   pTit[2].addEventListener("click", ()=>{ divOpac[0].remove(); });
-  const iDano = formTextInput("Daño sanado ( + )","id-dano",true);
+  const iDano = formTextInput("Daño sanado (+)","id-dano",true);
   
   const divB = formButtons(1, ["ACEPTAR"], [
     ()=>{ divOpac[0].remove(); healFighter(oFighter, iDano[2].value); }
