@@ -4,8 +4,8 @@
   --fontGeneral: 'Share Tech Mono', monospace;
   /* colores */
   --colorPri: #222222;
-  --colorSec: #808080;
-  --colorTer: #505050;
+  --colorSec: #afafaf;
+  --colorTer: #838383;
   --colorHgl: #0026ff;
   --colorLife100: #ffffff; 
   --colorLife090: #00a724; 
@@ -27,13 +27,13 @@ html {
 }
 body {
   font-family: var(--fontGeneral);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   line-height: 1.2;
   margin-bottom: 8rem;
 }
 @media (max-width: 750px) {
   body { 
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }
 
