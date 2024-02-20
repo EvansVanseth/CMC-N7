@@ -114,7 +114,7 @@ function findNextFighter(){
     console.log(FightersList.length);
     if(FightersList.length>0) {
       if(TurnControl.fighterName && TurnControl.fighterName!=="") {
-        getFighterByName(TurnControl.fighterName).startTurn();
+        getFighterByName(TurnControl.fighterName).EndTurn();
       }
       htmlBtnTurno.innerHTML = "SIGUIENTE";
       if(TurnControl.mode===0) {
@@ -135,7 +135,7 @@ function findNextFighter(){
             }
           } while (fighterFind==="");
           TurnControl.fighterName = fighterFind;
-          
+          getFighterByName(TurnControl.fighterName).StartTurn();
           if (getFighterByName(fighterFind).checkStates()) nextFighter();
       }
       updateTurn();
@@ -634,18 +634,21 @@ class fighter {
     return bInc;
   }
   startTurn(){
-    // Reduce en uno los turnos restantes de cada estado
-    this.states.forEach((s) => {
-      s.iTurnos--;
-    })
-    // Elimina los estados que han llegado a 0
-    this.states = this.states.filter(s => s.iTurnos>0);
     // Aumenta la cantidad de escudos si los escudos están activos
     if (!this.shieldsSaturated() && this.iShld > 0) {
       this.iShld += this.iRS;
       this.iShld = Math.min(this.iShld, this.iSH);
     }
   }
+  endTurn(){
+    // Reduce en uno los turnos restantes de cada estado
+    this.states.forEach((s) => {
+      s.iTurnos--;
+    })
+    // Elimina los estados que han llegado a 0
+    this.states = this.states.filter(s => s.iTurnos>0);
+  }
+
 
 };
 
