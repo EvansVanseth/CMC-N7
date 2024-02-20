@@ -32,10 +32,7 @@ function newCombat(){
   TurnControl.fighterName = "";
   TurnControl.mode = 0;
   htmlBtnTurno.innerHTML = "INICIAR";
-  showFighters();
-  showLife();
   updateTurn();
-  saveLocal();
 };
 function clearCombat(){
   if(TurnControl.mode === 0) return;
@@ -51,10 +48,7 @@ function clearCombat(){
   TurnControl.fighterPos = 999999999;
   TurnControl.mode = 0;
   htmlBtnTurno.innerHTML = "INICIAR";
-  showFighters();
-  showLife();
   updateTurn();
-  saveLocal();
 };
 function saveLocal(){
   localStorage.setItem("cmc-turn-cont", JSON.stringify(TurnControl));
@@ -99,9 +93,7 @@ function loadLocal(){
   })
   InitiativeList.sort(fighter.sortByInit);
   LifeList.sort(fighter.sortByName);
-  showFighters();
-  showLife();
-  showInitiative();
+  updateTurn();
 }
 function updateTurn(){
   if(TurnControl.mode===0) {
@@ -114,12 +106,16 @@ function updateTurn(){
   showFighters();
   showLife();
   showInitiative();
+  saveLocal();
 };
 function findNextFighter(){
   const promise = new Promise((resolve, reject) => {
     let fighterFind = "";
     console.log(FightersList.length);
     if(FightersList.length>0) {
+      if(TurnControl.fighterName && TurnControl.fighterName!=="") {
+        getFighterByName(TurnControl.fighterName).startTurn();
+      }
       htmlBtnTurno.innerHTML = "SIGUIENTE";
       if(TurnControl.mode===0) {
         TurnControl.mode = 1;
@@ -139,11 +135,10 @@ function findNextFighter(){
             }
           } while (fighterFind==="");
           TurnControl.fighterName = fighterFind;
-          getFighterByName(fighterFind).startTurn();
+          
           if (getFighterByName(fighterFind).checkStates()) nextFighter();
       }
       updateTurn();
-      saveLocal();
       resolve();
     } else reject();
   });
@@ -169,7 +164,7 @@ let fighterPanelClosed = false;
 /** Otras funciones generales */
 function toggleFightersPanel(){
   fighterPanelClosed = !fighterPanelClosed;
-  showFighters();
+  updateTurn();
 };
 /******** clase ESTADO Alterado **********/
 const standardStates = [
@@ -266,7 +261,7 @@ const standardStates = [
   {
     icon: 15,
     name: 'Invisible',
-    desc: '+2 a las tiradas e ataque y ignora el bonificador de Destreza a la CA de los enemigos.',
+    desc: '+2 a las tiradas de ataque y ignora el bonificador de Destreza a la CA de los enemigos.',
     inca: false
   },
   {
@@ -291,6 +286,12 @@ const standardStates = [
     icon: 19,
     name: 'Tumbado',
     desc: '-4 a las tiradas de ataque y no puede usar armas a distancia. +4 a CA contra ataques a distancia. -4 a CA contra ataques CC.',
+    inca: false
+  },
+  {
+    icon: 20,
+    name: 'Protecciones saturadas',
+    desc: 'Las protecciones están saturadas y no pueden protegerte.',
     inca: false
   },
 ]
@@ -449,6 +450,45 @@ class fighter {
     }
     return 1;
   }
+  // control de escudos
+  shieldsSaturation (iDeal) {
+    const newState = new state( 20, 
+      standardStates[20].name, 
+      standardStates[20].desc, 
+      standardStates[20].inca, 
+      2, 
+      this.sFullName());
+    this.states.push(newState);
+    /* Marea al combatiente si el daño que rompe
+       los escudos es superior a la mitad de sus
+       puntos totales
+    */
+    if (iDeal >= this.iSH/2) {
+      const newState = new state( 16, 
+        standardStates[16].name, 
+        standardStates[16].desc, 
+        standardStates[16].inca, 
+        1, 
+        this.sFullName());
+      this.states.push(newState);
+    }
+  }
+  shieldsSaturated () {
+    for (let s of this.states) {
+      if(s.iIcon === 20) return true;
+    }
+    return false;
+  }
+  shieldsForceSaturation () {
+    if (this.shieldsSaturated()) {
+      for (let s of this.states) {
+        if(s.iIcon === 20) s.iTurnos = 2;
+      }
+    }
+  }
+  shieldsActivation(){
+    this.iShld = this.iSH;
+  }
   // elemento HTML para COMBATIENTES 
   showInFighters(parent) {
     /*
@@ -594,12 +634,17 @@ class fighter {
     return bInc;
   }
   startTurn(){
+    // Reduce en uno los turnos restantes de cada estado
     this.states.forEach((s) => {
       s.iTurnos--;
     })
+    // Elimina los estados que han llegado a 0
     this.states = this.states.filter(s => s.iTurnos>0);
-    this.iShld += this.iRS;
-    this.iShld = Math.min(this.iShld, this.iSH);
+    // Aumenta la cantidad de escudos si los escudos están activos
+    if (!this.shieldsSaturated() && this.iShld > 0) {
+      this.iShld += this.iRS;
+      this.iShld = Math.min(this.iShld, this.iSH);
+    }
   }
 
 };
@@ -692,40 +737,31 @@ function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG,
   InitiativeList.sort(fighter.sortByInit);
   LifeList.push(newFighter);
   LifeList.sort(fighter.sortByName);
-  showFighters();
   updateTurn();
-  showLife();
-  saveLocal();
 };
 function editFighter(oFighter, sBonoInic, sIniciativa){
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
   InitiativeList.sort(fighter.sortByInit);
-  showInitiative();
-  showFighters();
-  showLife();
-  saveLocal();
+  updateTurn();
 };
 function deleteFighter(oFighter){
   InitiativeList.splice(posInitFighterByName(oFighter.sFullName()),1);
   FightersList.splice(posCombFighterByName(oFighter.sFullName()),1);
   LifeList.splice(posLifeFighterByName(oFighter.sFullName()),1);
   if(TurnControl.fighterName === oFighter.sFullName()) nextFighter();
-  else showInitiative();
-  showFighters();
-  showLife();
-  saveLocal();
+  updateTurn();
 };
 function dealFighter(oFighter, sDano){
   if (sDano==="") sDano="0";
+  if (sDano!=="0") oFighter.shieldsForceSaturation();
   if(oFighter.iShld > 0) {
     oFighter.iShld -= parseInt(sDano);
     oFighter.iShld = Math.max(0, oFighter.iShld); 
+    if(oFighter.iShld===0) oFighter.shieldsSaturation(parseInt(sDano));
   }
   else oFighter.iLife -= parseInt(sDano);
-  showLife();
-  showInitiative();
-  saveLocal();
+  updateTurn();
 };
 function healFighter(oFighter, sDano){
   if (sDano==="") sDano="0";
@@ -733,9 +769,8 @@ function healFighter(oFighter, sDano){
     oFighter.iShld += parseInt(sDano);
     oFighter.iShld = Math.min(oFighter.iSH, oFighter.iShld); 
   }
-  else oFighter.iLife += parseInt(sDano);  showLife();
-  showInitiative();
-  saveLocal();
+  else oFighter.iLife += parseInt(sDano);  
+  updateTurn();
 };
 
 /******* Actualizar listas ****************/
@@ -943,10 +978,31 @@ function formEditFighter(oFighter){
   pTIt[2].style.height = "0px";
   const iBono = formTextInput("Bonificador de iniciativa","id-bono-iniciativa",true);
   const iInit = formTextInput("Tirada de iniciativa","id-tira-iniciativa",true);
+
+  const pTSd = formSeccion(`Escudos`);
+  pTSd[2].style.height = "0px";
+  const divS = formButtons(2, ["REACTIVAR", "DESACTIVAR"], [
+    ()=>{ 
+      if(!oFighter.shieldsSaturated() && oFighter.iShld===0 ) {
+        divOpac[0].remove();
+        oFighter.shieldsActivation(); 
+        updateTurn();
+      }
+    },
+    ()=>{ 
+      if(!oFighter.shieldsSaturated() && oFighter.iShld > 0) {
+        divOpac[0].remove();
+        oFighter.shieldsSaturation(0); 
+        updateTurn();
+      }
+    }]
+    );
+  divS[0].style.justifyContent = "left";
+    
   const pTEt = formSeccion(`Estados alterados`);
   pTEt[2].style.height = "0px";
   const divE = formButtons(1, ["AÑADIR"], [
-    ()=>{ divOpac[0].remove(); formAddState(oFighter); showInitiative(); }
+    ()=>{ divOpac[0].remove(); formAddState(oFighter); updateTurn(); }
   ]);
   divE[0].style.justifyContent = "left";
   const pTEc = formSeccion(`Borrado`);
@@ -956,7 +1012,7 @@ function formEditFighter(oFighter){
   ]);
   divD[0].style.justifyContent = "left";
   const divB = formButtons(1, ["ACEPTAR"], [
-    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value); showInitiative();}
+    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value);  updateTurn();}
   ]);
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
@@ -972,6 +1028,8 @@ function formEditFighter(oFighter){
   divOpac[1].appendChild(pTIt[0]);
   divOpac[1].appendChild(iBono[0]);
   divOpac[1].appendChild(iInit[0]);
+  divOpac[1].appendChild(pTSd[0]);
+  divOpac[1].appendChild(divS[0]);
   divOpac[1].appendChild(pTEt[0]);
   oFighter.states.forEach(stateIn => {
     divOpac[1].appendChild(stateIn.showStateInEdit(divOpac[0]));
@@ -1147,11 +1205,11 @@ function formSelectStateType(oFighter, oState, bNew){
 window.addEventListener("load", ()=>{
   HTMLMain = document.querySelector("main");
   
-  loadLocal();
-  
   htmlNumTurno = document.querySelector("#num-turno");
   window.addEventListener("resize", checkwindowWidthChange);
-
+  
+  loadLocal();
+  
   htmlBtnTurno = document.getElementById("btn-next-turn");
   htmlBtnTurno.addEventListener("click", ()=>{ nextFighter() });
   if (TurnControl.mode===1) htmlBtnTurno.innerHTML = "CONTINUAR"

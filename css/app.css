@@ -39,7 +39,8 @@ body {
 }
 @media (max-width: 750px) {
   body { 
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    line-height: 1.2;
   }
 }
 
@@ -171,13 +172,13 @@ footer a {
   }
 }
 .app-logo {
-  width: 30%;
-  height: 30%;
+  width: 20%;
+  height: 20%;
 }
 @media (max-width: 750px) {
   .app-logo {
-    width: 50%;
-    height: 50%;
+    width: 40%;
+    height: 40%;
   }
 }
 
@@ -193,6 +194,12 @@ footer a {
   background-size: cover;
   min-height: 5rem;
 }
+@media (max-width: 750px) {
+  .app-mark {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 .mark-header {
   display: flex;
   align-items: center;
@@ -207,6 +214,8 @@ footer a {
 @media (max-width: 750px) {
   .mark-header {
     flex-direction: column;
+    margin-left: 2rem;
+    margin-right: 2rem;
   }  
 }
 .mark-group {
@@ -292,7 +301,7 @@ footer a {
   }
   .fighter {
     width: 45%;
-    margin-left: .5rem;
+    margin-left: 1rem;
   }
 }
 .fighter-name {
@@ -357,7 +366,7 @@ footer a {
 }
 .init-fighter {
   display: flex;
-  align-items: baseline;
+  align-items: last baseline;
   width: 50%;
   height: 2.7rem;
   color: var(--colorPri);
@@ -366,6 +375,7 @@ footer a {
 }
 @media (max-width: 750px) {
   .init-fighter {
+    height: 2.3rem;
     width: 100%;
   }
 }
@@ -420,6 +430,11 @@ footer a {
   flex-direction: column;
   justify-content: stretch;
 }
+@media (max-width: 750px) {
+  .panel-stats {
+    font-size: .9rem;
+  }
+}
 .stats-title {
   margin: 0;
 }
@@ -462,6 +477,8 @@ footer a {
   .life-fighter {
     margin: 0 auto;
     width: 100%;
+    font-size: 1.6rem;
+    padding: .2rem;
   }
 }
 .life-100 { color: black; background-color: var(--colorLife100);}
@@ -497,10 +514,11 @@ footer a {
 .life-total {
   width: 2rem;
   text-align: center;
-  font-weight: bold;
+  font-weight: 900;
 }
 .life-shld {
   color: var(--colorShld005);
+  font-weight: bold;
 }
 .life-btn {
   width: 3rem;
@@ -661,6 +679,11 @@ footer a {
   width: 90%;
   margin-bottom: .5rem;
 }
+@media (max-width: 750px) {
+  .state-frame {
+    align-items: center;
+  }
+}
 .state-name {
   padding: .2rem .5rem;
   margin: 0;
@@ -679,12 +702,22 @@ footer a {
   background-repeat: no-repeat;
   cursor: pointer;
 }
+@media (max-width: 750px) {
+  .state-edit {
+    height: 1.2rem;
+  }
+}
 .state-delete {
   margin: .5rem;
   background-image: url(../img/icons/delete.svg);
   background-size: contain;
   background-repeat: no-repeat;
   cursor: pointer;
+}
+@media (max-width: 750px) {
+  .state-delete {
+    height: 1.2rem;
+  }
 }
 .state-desc {
   background-color: var(--colorTer);
