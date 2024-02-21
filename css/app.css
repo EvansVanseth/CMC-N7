@@ -292,7 +292,7 @@ footer a {
   display: grid;
   grid-template-columns: 7fr 2fr 1fr;
   align-items: center;
-  width: 15rem;
+  width: 21rem;
 }
 @media (max-width: 750px) {
   .panel-fighters {
@@ -300,7 +300,7 @@ footer a {
     padding: .5rem 0;
   }
   .fighter {
-    width: 45%;
+    width: 95%;
     margin-left: 1rem;
   }
 }
@@ -375,7 +375,8 @@ footer a {
 }
 @media (max-width: 750px) {
   .init-fighter {
-    height: 2.3rem;
+    font-size: 1rem;
+    height: 1.9rem;
     width: 100%;
   }
 }
@@ -417,7 +418,7 @@ footer a {
 
 @media (max-width: 750px) {
   .init-name {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
    }
 }
 
@@ -432,7 +433,7 @@ footer a {
 }
 @media (max-width: 750px) {
   .panel-stats {
-    font-size: .9rem;
+    font-size: .8rem;
   }
 }
 .stats-title {
@@ -478,7 +479,7 @@ footer a {
   .life-fighter {
     margin: 0 auto;
     width: 100%;
-    font-size: 1.6rem;
+    font-size: 1.3rem;
     padding: .2rem;
   }
 }
@@ -514,13 +515,13 @@ footer a {
 .life-value {
   width: 2rem;
   text-align: center;
-  padding: .3rem;
+  padding: .2rem;
 }
 .life-total {
   width: 2rem;
   text-align: center;
   font-weight: 900;
-  padding: .3rem;
+  padding: .2rem;
 }
 
 .shld-tupla {
@@ -542,14 +543,14 @@ footer a {
 .shld-value {
   width: 2rem;
   text-align: center;
-  padding: .3rem;
+  padding: .2rem;
   color: var(--colorShld005);
 }
 .shld-total {
   width: 2rem;
   text-align: center;
   font-weight: 900;
-  padding: .3rem;
+  padding: .2rem;
   color: var(--colorShld005);
 }
 .shld-inactive {
