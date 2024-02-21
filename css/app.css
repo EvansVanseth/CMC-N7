@@ -459,6 +459,7 @@ footer a {
 /* PANEL LIFE */
 .panel-life {
   display: flex;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: 1rem;
   padding: .5rem 1.5rem;
@@ -469,7 +470,7 @@ footer a {
   justify-content: right;
   align-items: center;
   gap: .5rem;
-  border: .4rem solid var(--colorShld090);
+  border: .2rem solid var(--colorPri);
   border-radius: 1rem;
   padding: .5rem
 }
@@ -489,6 +490,48 @@ footer a {
 .life-5 { color: white; background-color: var(--colorLife005);}
 .life-0 { color: white; background-color: var(--colorLife000);}
 
+.life-name {
+  width: 10rem;
+  text-align: right;
+  padding-right: .5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+@media (max-width: 750px) {
+  .life-name {
+    width: auto;
+  }
+}
+.life-tupla {
+  display: flex;
+  justify-content: space-evenly;
+  border: .2rem solid var(--colorPri);
+  border-radius: 1rem;
+  gap: .2rem;
+  min-width: 20%;
+  cursor: pointer;
+}
+.life-value {
+  width: 2rem;
+  text-align: center;
+  padding: .3rem;
+}
+.life-total {
+  width: 2rem;
+  text-align: center;
+  font-weight: 900;
+  padding: .3rem;
+}
+
+.shld-tupla {
+  display: flex;
+  justify-content: space-evenly;
+  border: .2rem solid var(--colorPri);
+  border-radius: 1rem;
+  gap: .2rem;
+  min-width: 20%;
+  cursor: pointer;
+}
 .shld-90 { border-color: var(--colorShld090);}
 .shld-70 { border-color: var(--colorShld070);}
 .shld-45 { border-color: var(--colorShld045);}
@@ -496,43 +539,21 @@ footer a {
 .shld-5 { border-color: var(--colorShld005);}
 .shld-0 { border-color: var(--colorShld000);}
 
-.life-name {
-  width: 8rem;
-  text-align: right;
-  padding-right: .5rem;
-  border-right: .2rem solid var(--colorPri);
-}
-@media (max-width: 750px) {
-  .life-name {
-    width: auto;
-  }
-}
-.life-value {
+.shld-value {
   width: 2rem;
   text-align: center;
-}
-.life-total {
-  width: 2rem;
-  text-align: center;
-  font-weight: 900;
-}
-.life-shld {
+  padding: .3rem;
   color: var(--colorShld005);
-  font-weight: bold;
 }
-.life-btn {
-  width: 3rem;
-  display: block;
-  border: .2rem solid var(--colorPri);
-  border-radius: .5rem;
+.shld-total {
+  width: 2rem;
+  text-align: center;
   font-weight: 900;
-  font-size: 1.8rem;
-  color: white;
-  background-color: var(--colorTer);
+  padding: .3rem;
+  color: var(--colorShld005);
 }
-.life-btn:hover {
-  color: var(--colorPri);
-  background-color: var(--colorSec);
+.shld-inactive {
+  visibility: hidden;
 }
 /* -------------------------------------------------------- */
 /* FORM */
@@ -667,6 +688,11 @@ footer a {
   .form-label-checkbox {
     width: 14.5rem;
   }
+}
+.form-details-text {
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 0 auto;
 }
 /* -------------------------------------------------------- */
 /* STATE IN FORM */
