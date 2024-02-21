@@ -1020,20 +1020,20 @@ function formEditFighter(oFighter){
       }
     }]
     );
-  divS[0].style.justifyContent = "left";
+  divS[0].style.justifyContent = "space-evenly";
     
   const pTEt = formSeccion(`Estados alterados`);
   pTEt[2].style.height = "0px";
   const divE = formButtons(1, ["AÑADIR"], [
     ()=>{ divOpac[0].remove(); formAddState(oFighter); updateTurn(); }
   ]);
-  divE[0].style.justifyContent = "left";
+  divE[0].style.justifyContent = "center";
   const pTEc = formSeccion(`Borrado`);
   pTEc[2].style.height = "0px";
   const divD = formButtons(1, ["ELIMINAR COMBATIENTE"], [
     ()=>{ divOpac[0].remove(); deleteFighter(oFighter, iBono[2].value, iInit[2].value); }
   ]);
-  divD[0].style.justifyContent = "left";
+  divD[0].style.justifyContent = "center";
   const divB = formButtons(1, ["ACEPTAR"], [
     ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value);  updateTurn();}
   ]);
@@ -1051,13 +1051,16 @@ function formEditFighter(oFighter){
   divOpac[1].appendChild(pTIt[0]);
   divOpac[1].appendChild(iBono[0]);
   divOpac[1].appendChild(iInit[0]);
+  divOpac[1].appendChild(formText("Los cambios que realices en los datos de iniciativa afectarán inmediatamente al orden de turno<hr>"));
   divOpac[1].appendChild(pTSd[0]);
   divOpac[1].appendChild(divS[0]);
+  divOpac[1].appendChild(formText("Esta sección permite reactivar y desactivar los escudos a voluntad. Aunque no podrán reactivarse si el combatiente tiene el estado<br>[Protecciones saturadas]<hr>"));
   divOpac[1].appendChild(pTEt[0]);
   oFighter.states.forEach(stateIn => {
     divOpac[1].appendChild(stateIn.showStateInEdit(divOpac[0]));
   })
   divOpac[1].appendChild(divE[0]);
+  divOpac[1].appendChild(formText("Aqui puedes añadir estados alterados al combatiente<hr>"));
   divOpac[1].appendChild(pTEc[0]);
   divOpac[1].appendChild(divD[0]);
   divOpac[1].appendChild(divB[0]);

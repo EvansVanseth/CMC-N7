@@ -83,6 +83,10 @@ img {
   display: block;
   height: auto;
 }
+hr {
+  border: .1rem solid var(--colorPri);
+  width: 90%;
+}
 
 footer {
   margin-top: 5rem auto 0 auto;
