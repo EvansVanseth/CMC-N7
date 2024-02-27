@@ -762,9 +762,12 @@ function editFighter(oFighter, sBonoInic, sIniciativa){
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
   InitiativeList.sort(fighter.sortByInit);
-  if (oFighter.sFullName() === TurnControl.fighterName &&   
-      HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
+  if (oFighter.sFullName() === TurnControl.fighterName) {
+    if (HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
         nextFighter();
+    } else {
+      TurnControl.fighterPos = oFighter.iControlInit;
+    }
   } else {
     updateTurn();
   }
