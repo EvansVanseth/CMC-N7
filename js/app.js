@@ -759,12 +759,14 @@ function HaveChangedListOrderByName (List1, List2) {
 }
 function editFighter(oFighter, sBonoInic, sIniciativa){
   const oldInitiative = [...InitiativeList];
+  const oldInit = oFighter.iControlInit;
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
   InitiativeList.sort(fighter.sortByInit);
   if (oFighter.sFullName() === TurnControl.fighterName) {
     if (HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
-        nextFighter();
+      if(oldInit > oFighter.iControlInit) TurnControl.fighterName = "";
+      nextFighter();
     } else {
       TurnControl.fighterPos = oFighter.iControlInit;
       updateTurn();
