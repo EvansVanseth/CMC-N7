@@ -750,17 +750,29 @@ function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG,
   updateTurn();
 };
 function editFighter(oFighter, sBonoInic, sIniciativa){
+  const oldInitiative = [...InitiativeList];
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
   InitiativeList.sort(fighter.sortByInit);
-  updateTurn();
+  if (oFighter.sFullName() === TurnControl.fighterName) {  
+    let i;
+    for (i=0; i<oldInitiative.length; i++) {
+      if(oldInitiative[i].sFullName() !== InitiativeList[i].sFullName()) {
+        nextFighter();
+        break;
+      } else {
+        TurnControl.fighterPos = oFighter.iControlInit;
+        updateTurn();
+      }
+    }
+  } else updateTurn();
 };
 function deleteFighter(oFighter){
   InitiativeList.splice(posInitFighterByName(oFighter.sFullName()),1);
   FightersList.splice(posCombFighterByName(oFighter.sFullName()),1);
   LifeList.splice(posLifeFighterByName(oFighter.sFullName()),1);
   if(TurnControl.fighterName === oFighter.sFullName()) nextFighter();
-  updateTurn();
+  else updateTurn();
 };
 function modShldFighter(oFighter, sDano){
   if (sDano==="") sDano="0";
@@ -772,7 +784,6 @@ function modShldFighter(oFighter, sDano){
     oFighter.shieldsSaturation(Math.abs(iDano));
   }
   else oFighter.iShld = Math.min(oFighter.iSH, oFighter.iShld); 
-  
   updateTurn();
 };
 function modLifeFighter(oFighter, sDano){
