@@ -749,22 +749,23 @@ function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG,
   LifeList.sort(fighter.sortByName);
   updateTurn();
 };
+function HaveChangedListOrderByName (List1, List2) {
+  let i;
+  for (i=0; i<List1.length; i++) {
+    if(List1[i].sFullName() !== List2[i].sFullName()) {
+      return true;
+    }
+  }
+  return false;
+}
 function editFighter(oFighter, sBonoInic, sIniciativa){
   const oldInitiative = [...InitiativeList];
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
   InitiativeList.sort(fighter.sortByInit);
-  if (oFighter.sFullName() === TurnControl.fighterName) {  
-    let i;
-    for (i=0; i<oldInitiative.length; i++) {
-      if(oldInitiative[i].sFullName() !== InitiativeList[i].sFullName()) {
+  if (oFighter.sFullName() === TurnControl.fighterName &&   
+      HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
         nextFighter();
-        break;
-      } else {
-        TurnControl.fighterPos = oFighter.iControlInit;
-        updateTurn();
-      }
-    }
   } else updateTurn();
 };
 function deleteFighter(oFighter){
@@ -1007,7 +1008,7 @@ function formEditFighter(oFighter){
   const divOpac = formPrep();
   // VISUAL
   const pTit = formTitle(oFighter.sFullName());
-  pTit[2].addEventListener("click", ()=>{ divOpac[0].remove(); });
+  pTit[2].addEventListener("click", ()=>{ divOpac[0].remove(); updateTurn(); });
   const pTIt = formSeccion(`Iniciativa`);
   pTIt[2].style.height = "0px";
   const iBono = formTextInput("Bonificador","id-bono-iniciativa",true);
@@ -1046,7 +1047,7 @@ function formEditFighter(oFighter){
   ]);
   divD[0].style.justifyContent = "center";
   const divB = formButtons(1, ["ACEPTAR"], [
-    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value);  updateTurn();}
+    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value); }
   ]);
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
