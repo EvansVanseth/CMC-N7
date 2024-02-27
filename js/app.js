@@ -767,7 +767,7 @@ function modShldFighter(oFighter, sDano){
   const iDano = parseInt(sDano);
   //Quitamos escudos
   oFighter.iShld += iDano;
-  if (iDano < 0) { 
+  if (oFighter.iShld <= 0) { 
     oFighter.iShld = Math.max(0, oFighter.iShld); 
     oFighter.shieldsSaturation(Math.abs(iDano));
   }
