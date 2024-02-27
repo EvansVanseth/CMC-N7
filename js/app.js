@@ -125,8 +125,7 @@ function findNextFighter(){
         if (InitiativeList[0].checkStates()) nextFighter();
       } else {
         do {
-          if(TurnControl.fighterPos<80000000 || 
-            TurnControl.fighterName === InitiativeList[InitiativeList.length-1].sFullName()) {
+          if(TurnControl.fighterPos < InitiativeList[InitiativeList.length-1].iControlInit) {
               TurnControl.fighterPos = InitiativeList[0].iControlInit + 1;
               TurnControl.fighterName = "";
               TurnControl.turno++;
@@ -766,7 +765,9 @@ function editFighter(oFighter, sBonoInic, sIniciativa){
   if (oFighter.sFullName() === TurnControl.fighterName &&   
       HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
         nextFighter();
-  } else updateTurn();
+  } else {
+    updateTurn();
+  }
 };
 function deleteFighter(oFighter){
   InitiativeList.splice(posInitFighterByName(oFighter.sFullName()),1);
