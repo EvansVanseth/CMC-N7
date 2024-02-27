@@ -767,6 +767,7 @@ function editFighter(oFighter, sBonoInic, sIniciativa){
         nextFighter();
     } else {
       TurnControl.fighterPos = oFighter.iControlInit;
+      updateTurn();
     }
   } else {
     updateTurn();
