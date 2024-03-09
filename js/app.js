@@ -171,7 +171,7 @@ function toggleFightersPanel(){
 const standardStates = [
   {
     icon: 0,
-    name: '',
+    name: '- Personalizado -',
     desc: '',
     inca: false
   },
@@ -850,7 +850,13 @@ function checkwindowWidthChange(){
       showInitiative();
     }
 }
-
+function getPositionStatebyName (name) {
+  for (let i = 0; i < standardStates.length; i++) {
+    const state = standardStates[i];
+    if(state.name === name) return i;
+  }
+  return 0;
+}
 /******* Elementos de ayuda para FORMULARIOS **********/
 function formPrep(){
   const divOpac = document.createElement("div");
@@ -955,6 +961,25 @@ function formButtons(numButtons, Captions, OnCliks){
     buttons.push(bAdd);
   }
   return [divB, buttons];
+}
+function formSelect (ID, Elements){
+  const select = document.createElement("select");
+  select.setAttribute("id",ID);
+  select.setAttribute("size","4");
+
+  const SortedElements = [...Elements];
+  SortedElements.sort((fA, fB) => {
+    if(fA.name < fB.name) return -1;
+    return 1;
+  })
+  
+  for(let i=0;i<SortedElements.length;i++){
+    const opt = document.createElement("option");
+    opt.setAttribute("value", SortedElements[i].name);
+    opt.innerHTML = SortedElements[i].name;
+    select.appendChild(opt);
+  }
+  return select;
 }
 function autogrow(element) {
   element.style.height = "5px";
@@ -1257,17 +1282,18 @@ function formSelectStateType(oFighter, oState, bNew){
   const pTit = formSeccion(`Seleccionar estado alterado estandar`);
   pTit[2].style.height = "0px";
 
+  const sEst = formSelect("id-select-state",standardStates);
+
+  const bSel = formButtons(1, ["Seleccionar"], [()=>{
+    divOpac[0].remove();
+    const type = getPositionStatebyName(sEst.options[sEst.selectedIndex].value);
+    if (bNew) formAddState(oFighter, type);
+    else formEditState(oFighter, oState, type);
+  }])
+
   divOpac[1].appendChild(pTit[0]);
-  for(let i=0;i<standardStates.length;i++){
-    let divB = formButtons(1,
-      [i===0?'- Personalizado -':standardStates[i].name],
-      [()=>{
-        divOpac[0].remove();
-        if (bNew) formAddState(oFighter, i);
-        else formEditState(oFighter, oState, i);
-    }])
-    divOpac[1].appendChild(divB[0]);
-  }
+  divOpac[1].appendChild(sEst);
+  divOpac[1].appendChild(bSel[0]);
 
   HTMLMain.appendChild(divOpac[0]);
 }
