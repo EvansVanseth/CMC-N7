@@ -699,6 +699,33 @@ footer a {
   text-align: center;
   margin: 0 auto;
 }
+.form-select {
+  border: .2rem solid var(--colorPri);
+  border-radius: .5rem;
+  padding: .5rem;
+  text-align: right;
+  background-color: var(--colorSec);
+}
+.form-select option {
+  margin-top: .4rem;
+  margin-bottom: .4rem;
+}
+
+.form-select option:hover,
+.form-select option:focus,
+.form-select option:active {
+  background: linear-gradient(to right,var(--colorSec),var(--colorTer));  
+  background-color: var(--colorSec) !important; 
+  color: var(--colorPri) !important;
+  font-weight: 700;
+}
+.form-select option:checked {
+  background: linear-gradient(to right,var(--colorSec),var(--colorTer));  
+  background-color: var(--colorSec) !important; 
+  color: var(--colorPri) !important;
+  /* font-weight: 700;   */
+}
+
 /* -------------------------------------------------------- */
 /* STATE IN FORM */
 .state-frame {

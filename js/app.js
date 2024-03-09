@@ -295,6 +295,42 @@ const standardStates = [
     desc: 'Las protecciones están saturadas y no pueden protegerte.',
     inca: false
   },
+  {
+    icon: 21,
+    name: 'Anclado',
+    desc: 'Puntuación de Fuerza y Destreza a 0. Es incapaz de moverse o actuar y se queda bloqueado en la posición  aunque no tenga apoyo alguno . No pede ser desplazado. Está indefenso.',
+    inca: false
+  },
+  {
+    icon: 22,
+    name: 'Ardiendo',
+    desc: 'Un personaje ardiendo sufre 1d6 puntos de daño por fuego cada asalto en su turno.',
+    inca: false
+  },
+  {
+    icon: 23,
+    name: 'Congelado',
+    desc: 'Puntuación de Fuerza y Destreza a 0. Incapaz de moverse o actuar. Su cuerpo se queda hecho un bloque de hielo. Doble de daño por contundente o daño por fuego, la mitad por cortante y no puede sufrir daño de una fuente física punzante.',
+    inca: false
+  },
+  {
+    icon: 24,
+    name: 'Electrizado',
+    desc: 'Una criatura electrizada no puede realizar ninguna acción. si falla un TS de Voluntad. Si salva el TS, sigue electrizada, pero puede  intentar descargarse.',
+    inca: false
+  },
+  {
+    icon: 25,
+    name: 'Elevado',
+    desc: 'No puede cambiar de posición a voluntad, falla automáticamente  TS de reflejos, penalizador de -4  a  sus ataques y sólo puede realizar acciones parciales. Toda criatura elevada está también zero-imbuida.',
+    inca: false
+  },
+  {
+    icon: 26,
+    name: 'Zero-imbuido',
+    desc: 'Recibe un penalizador de -1 a TS contra poderes bióticos y sus escudos no pueden recuperar puntos de golpe ni ser reactivados. No se conocen mecanismos para dejar de estar en este estado.',
+    inca: false
+  }  
 ]
 class state {
   constructor( iIcon,
@@ -964,8 +1000,9 @@ function formButtons(numButtons, Captions, OnCliks){
 }
 function formSelect (ID, Elements){
   const select = document.createElement("select");
+  select.classList.add("form-select");
   select.setAttribute("id",ID);
-  select.setAttribute("size","4");
+  select.setAttribute("size","8");
 
   const SortedElements = [...Elements];
   SortedElements.sort((fA, fB) => {
