@@ -394,7 +394,7 @@ footer a {
 }
 .init-dead {
   text-decoration: line-through;
-  color: var(--colorSec);
+  color: var(--colorTer);
 }
 /* .init-knocked{
   color: var(--colorSec);

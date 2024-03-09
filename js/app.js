@@ -731,6 +731,9 @@ function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG,
   let iPG = parseInt(sPG);
   let iSH = parseInt(sSH);
   let iRS = parseInt(sRS);
+  if(bJugador) {
+    iPG = 1; iSH = 1; iRS = 1;
+  }
   if (existsFighterByName(sNombre)) return;
   const newFighter = new fighter(sNombre, 
                                  sBonoInic, 
@@ -782,14 +785,17 @@ function deleteFighter(oFighter){
   if(TurnControl.fighterName === oFighter.sFullName()) nextFighter();
   else updateTurn();
 };
-function modShldFighter(oFighter, sDano){
+function modShldFighter(oFighter, sDano, cbMasivo){
   if (sDano==="") sDano="0";
   const iDano = parseInt(sDano);
   //Quitamos escudos
   oFighter.iShld += iDano;
   if (oFighter.iShld <= 0) { 
+    if(cbMasivo) {
+      oFighter.iLife += oFighter.iShld;
+    }
     oFighter.iShld = Math.max(0, oFighter.iShld); 
-    oFighter.shieldsSaturation(Math.abs(iDano));
+    oFighter.shieldsSaturation(0);
   }
   else oFighter.iShld = Math.min(oFighter.iSH, oFighter.iShld); 
   updateTurn();
@@ -1099,8 +1105,10 @@ function formShieldFighter(oFighter){
   pExp2.classList.add("form-details-text");
   pExp2.innerHTML = "Un valor negativo reducirá los escudos esa cantidad";
 
+  const cbMass = formCheckBox("Daño masivo","id-dano-masivo");
+  
   const divB = formButtons(1, ["ACEPTAR"], [
-    ()=>{ divOpac[0].remove(); modShldFighter(oFighter, iDano[2].value); }
+    ()=>{ divOpac[0].remove(); modShldFighter(oFighter, iDano[2].value, cbMass[1].checked); }
   ]);  
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
@@ -1111,6 +1119,7 @@ function formShieldFighter(oFighter){
   divOpac[1].appendChild(iDano[0]);
   divOpac[1].appendChild(pExp1);
   divOpac[1].appendChild(pExp2);
+  divOpac[1].appendChild(cbMass[0]);
   divOpac[1].appendChild(divB[0]);
   HTMLMain.appendChild(divOpac[0]);
 };
