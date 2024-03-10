@@ -75,6 +75,8 @@ function loadLocal(){
     newFighter.iSH = element.iSH;
     newFighter.iShld = element.iShld;
     newFighter.iRS = element.iRS;
+    newFighter.bBL = element.bBL;
+    newFighter.bBS = element.bBS;
     newFighter.iDesEmpInit = element.iDesEmpInit;
     newFighter.iControlInit = element.iControlInit;
     element.states.forEach(eleState => {
@@ -802,11 +804,13 @@ function HaveChangedListOrderByName (List1, List2) {
   }
   return false;
 }
-function editFighter(oFighter, sBonoInic, sIniciativa){
+function editFighter(oFighter, sBonoInic, sIniciativa, bBlindedLife, bBlindedShields){
   const oldInitiative = [...InitiativeList];
   const oldInit = oFighter.iControlInit;
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
+  oFighter.bBL = bBlindedLife;
+  oFighter.bBS = bBlindedShields;
   InitiativeList.sort(fighter.sortByInit);
   if (oFighter.sFullName() === TurnControl.fighterName) {
     if (HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
@@ -1060,7 +1064,9 @@ function formNewFighter(){
                        iChbxT[1].checked, 
                        iPtGP[2].value,
                        iPtSH[2].value,
-                       iPtRS[2].value );}
+                       iPtRS[2].value,
+                       cBlLf[1].checked,
+                       cBlSh[1].checked );}
   ]);
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
@@ -1105,7 +1111,7 @@ function formEditFighter(oFighter){
   const sBli = formSeccion(`Blindaje`);
   sBli[2].style.height = "0px";
   const cBlLf = formCheckBox("Vida","id-blinded-life");
-  const cBlSh = formCheckBox("Escudos","id-blindel-shields");  
+  const cBlSh = formCheckBox("Escudos","id-blindel-shields");
 
   const pTSd = formSeccion(`Escudos`);
   pTSd[2].style.height = "0px";
@@ -1140,7 +1146,7 @@ function formEditFighter(oFighter){
   ]);
   divD[0].style.justifyContent = "center";
   const divB = formButtons(1, ["ACEPTAR"], [
-    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value); }
+    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value, cBlLf[1].checked, cBlSh[1].checked); }
   ]);
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
@@ -1150,6 +1156,8 @@ function formEditFighter(oFighter){
   // LOGICA
   iBono[2].value = `${oFighter.iInit_bon}`;
   iInit[2].value = `${oFighter.iInit_value}`;
+  cBlLf[1].checked = oFighter.bBL;
+  cBlSh[1].checked = oFighter.bBS;
 
   //MONTAJE
   divOpac[1].appendChild(pTit[0]);
