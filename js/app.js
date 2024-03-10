@@ -625,6 +625,9 @@ class fighter {
     })
 
     /* Shields */
+    const divBS = document.createElement("div"); 
+    divBS.classList.add("mark-blinded");
+    if(this.bBS) divBS.classList.add("blinded");
     const divSF = document.createElement("div"); 
     divSF.classList.add(`shld-tupla`);
     if(this.shieldsSaturated()) this.iShld = 0;
@@ -646,32 +649,37 @@ class fighter {
     divSF.addEventListener("click", ()=>{
       formShieldFighter(this);
     })
+    divBS.appendChild(divSF);
     
     /* Life */
+    const divBL = document.createElement("div"); 
+    divBL.classList.add("mark-blinded");
+    if(this.bBL) divBL.classList.add("blinded");
     const divLF = document.createElement("div"); 
     divLF.classList.add(`life-tupla`);
-      const divL = document.createElement("div");
-      divL.classList.add(`life-value`);
-      divL.innerHTML = `${this.iLife}`;
-      const divT = document.createElement("div");
-      divT.classList.add(`life-total`);
-      divT.innerHTML = `${this.iPG}`;
-      if (this.iLife > this.iPG) divLF.classList.add("life-100");
-      else if (this.iLife / this.iPG > 0.85) divLF.classList.add("life-90");
-      else if (this.iLife / this.iPG > 0.55) divLF.classList.add("life-70");
-      else if (this.iLife / this.iPG > 0.35) divLF.classList.add("life-45");
-      else if (this.iLife / this.iPG > 0.1) divLF.classList.add("life-25");
-      else if (this.iLife / this.iPG > 0) divLF.classList.add("life-5");
-      else divLF.classList.add("life-0");
+    const divL = document.createElement("div");
+    divL.classList.add(`life-value`);
+    divL.innerHTML = `${this.iLife}`;
+    const divT = document.createElement("div");
+    divT.classList.add(`life-total`);
+    divT.innerHTML = `${this.iPG}`;
+    if (this.iLife > this.iPG) divLF.classList.add("life-100");
+    else if (this.iLife / this.iPG > 0.85) divLF.classList.add("life-90");
+    else if (this.iLife / this.iPG > 0.55) divLF.classList.add("life-70");
+    else if (this.iLife / this.iPG > 0.35) divLF.classList.add("life-45");
+    else if (this.iLife / this.iPG > 0.1) divLF.classList.add("life-25");
+    else if (this.iLife / this.iPG > 0) divLF.classList.add("life-5");
+    else divLF.classList.add("life-0");
     divLF.appendChild(divL);
     divLF.appendChild(divT);
     divLF.addEventListener("click", ()=>{
       formHealedFighter(this);
     })
+    divBL.appendChild(divLF);
     
     divF.appendChild(divN);
-    divF.appendChild(divSF);
-    divF.appendChild(divLF);
+    divF.appendChild(divBS);
+    divF.appendChild(divBL);
     parent.appendChild(divF);   
   }
   checkStates(){

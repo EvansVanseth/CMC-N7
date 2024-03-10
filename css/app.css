@@ -560,6 +560,15 @@ footer a {
 .shld-inactive {
   visibility: hidden;
 }
+.mark-blinded {
+  border: .3rem solid transparent;
+  border-radius: 1.3rem;
+  padding: 0.1rem;
+}
+.blinded {
+  border: .3rem solid #ff7525;
+}
+
 /* -------------------------------------------------------- */
 /* FORM */
 .form-exterior {
