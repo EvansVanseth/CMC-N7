@@ -299,7 +299,7 @@ const standardStates = [
     icon: 21,
     name: 'Anclado',
     desc: 'Puntuación de Fuerza y Destreza a 0. Es incapaz de moverse o actuar y se queda bloqueado en la posición  aunque no tenga apoyo alguno . No pede ser desplazado. Está indefenso.',
-    inca: false
+    inca: true
   },
   {
     icon: 22,
@@ -311,18 +311,18 @@ const standardStates = [
     icon: 23,
     name: 'Congelado',
     desc: 'Puntuación de Fuerza y Destreza a 0. Incapaz de moverse o actuar. Su cuerpo se queda hecho un bloque de hielo. Doble de daño por contundente o daño por fuego, la mitad por cortante y no puede sufrir daño de una fuente física punzante.',
-    inca: false
+    inca: true
   },
   {
     icon: 24,
     name: 'Electrizado',
     desc: 'Una criatura electrizada no puede realizar ninguna acción. si falla un TS de Voluntad. Si salva el TS, sigue electrizada, pero puede  intentar descargarse.',
-    inca: false
+    inca: true
   },
   {
     icon: 25,
     name: 'Elevado',
-    desc: 'No puede cambiar de posición a voluntad, falla automáticamente  TS de reflejos, penalizador de -4  a  sus ataques y sólo puede realizar acciones parciales. Toda criatura elevada está también zero-imbuida.',
+    desc: 'Toda criatura elevada está también zero-imbuida. No puede cambiar de posición a voluntad, falla automáticamente  TS de reflejos, penalizador de -4  a  sus ataques y sólo puede realizar acciones parciales.',
     inca: false
   },
   {
@@ -422,7 +422,9 @@ class fighter {
                iNumRep,
                iPG,
                iSH,
-               iRS
+               iRS,
+               bBL,
+               bBS
                ) {
     this.sName = sName;
     this.iInit_bon = 0;
@@ -430,6 +432,8 @@ class fighter {
     this.iBono_control = 0;
     this.iInit_control = 0;
     this.bPje = bPje;
+    this.bBL = bBL;
+    this.bBS = bBS;
     this.iNumRep = iNumRep;
     this.iPG = iPG;
     this.iLife = iPG;
@@ -759,7 +763,7 @@ function posLifeFighterByName(sTestName) {
   }
   return -1;
 };
-function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG, sSH, sRS){
+function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG, sSH, sRS, bBlindedLife, bBlindedShields){
   if(sNombre === "") return;
   if (sPG === "") sPG = "0";
   if (sSH === "") sSH = "0";
@@ -778,7 +782,9 @@ function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG,
                                  getLastFighterByName(sNombre), 
                                  iPG,
                                  iSH,
-                                 iRS);
+                                 iRS,
+                                 bBlindedLife,
+                                 bBlindedShields);
   if (bTiradaAuto) newFighter.setInit(Math.floor(Math.random()*20)+1+newFighter.iInit_bon);
   FightersList.push(newFighter);
   InitiativeList.push(newFighter);
@@ -1034,6 +1040,10 @@ function formNewFighter(){
   iSIni[2].style.height = "0px";
   const iBono = formTextInput("Bonificador","id-bono-iniciativa",true);
   const iInit = formTextInput("Tirada","id-tira-iniciativa",true);
+  const iSBli = formSeccion("Blindaje");
+  iSBli[2].style.height = "0px";
+  const cBlLf = formCheckBox("Vida","id-blinded-life");
+  const cBlSh = formCheckBox("Escudos","id-blindel-shields");
   const iSVid = formSeccion("Vida y escudos");
   iSVid[2].style.height = "0px";
   const iPtGP = formTextInput("Vida (PG)","id-puntos-golpe",true);
@@ -1070,6 +1080,9 @@ function formNewFighter(){
   divOpac[1].appendChild(iSIni[0]);
   divOpac[1].appendChild(iBono[0]);
   divOpac[1].appendChild(iInit[0]);
+  divOpac[1].appendChild(iSBli[0]);
+  divOpac[1].appendChild(cBlLf[0]);
+  divOpac[1].appendChild(cBlSh[0]);
   divOpac[1].appendChild(iSVid[0]);
   divOpac[1].appendChild(iPtGP[0]);
   divOpac[1].appendChild(iPtSH[0]);
@@ -1088,6 +1101,11 @@ function formEditFighter(oFighter){
   pTIt[2].style.height = "0px";
   const iBono = formTextInput("Bonificador","id-bono-iniciativa",true);
   const iInit = formTextInput("Tirada","id-tira-iniciativa",true);
+
+  const sBli = formSeccion(`Blindaje`);
+  sBli[2].style.height = "0px";
+  const cBlLf = formCheckBox("Vida","id-blinded-life");
+  const cBlSh = formCheckBox("Escudos","id-blindel-shields");  
 
   const pTSd = formSeccion(`Escudos`);
   pTSd[2].style.height = "0px";
@@ -1139,6 +1157,9 @@ function formEditFighter(oFighter){
   divOpac[1].appendChild(iBono[0]);
   divOpac[1].appendChild(iInit[0]);
   divOpac[1].appendChild(formText("Los cambios que realices en los datos de iniciativa afectarán inmediatamente al orden de turno<hr>"));
+  divOpac[1].appendChild(sBli[0]);
+  divOpac[1].appendChild(cBlLf[0]);
+  divOpac[1].appendChild(cBlSh[0]);
   divOpac[1].appendChild(pTSd[0]);
   divOpac[1].appendChild(divS[0]);
   divOpac[1].appendChild(formText("Esta sección permite reactivar y desactivar los escudos a voluntad. Aunque no podrán reactivarse si el combatiente tiene el estado<br>[Protecciones saturadas]<hr>"));

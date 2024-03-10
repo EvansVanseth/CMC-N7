@@ -784,4 +784,5 @@ footer a {
   grid-row: 2;
   grid-column: 1 / 5;
   margin: 0;
+  font-size: 1.1rem;
 }
