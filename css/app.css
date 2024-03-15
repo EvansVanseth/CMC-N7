@@ -144,7 +144,7 @@ footer a {
   transition-duration: 0.2s;
   transition-property: transform, color, background-color;
 }
-.btn:hover {
+.btn:active {
   transform: scale(.98);
   color: var(--colorPri);
   background-color: var(--colorTer);
@@ -327,8 +327,10 @@ footer a {
   border-left: .2rem solid var(--colorPri);
   background: var(--colorPri);
   color: var(--colorSec);
+  transition-duration: 0.2s;
+  transition-property: color, background-color;
 }
-.fighter-adds:hover {
+.fighter-adds:active {
   background: var(--colorTer);
   color: var(--colorPri);
 }
@@ -369,6 +371,8 @@ footer a {
   color: var(--colorPri);
   font-weight: bold;
   cursor: default;
+  transition-duration: 0.2s;
+  transition-property: color;
 }
 @media (max-width: 750px) {
   .init-fighter {
@@ -377,7 +381,7 @@ footer a {
     width: 100%;
   }
 }
-.init-fighter:hover {
+.init-fighter:active {
   color: var(--colorHgl);
 }
 .init-active {
