@@ -283,6 +283,7 @@ footer a {
 .panel-fighters {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
   gap: 1rem;
   padding: .5rem 1.5rem;
 }
@@ -297,7 +298,7 @@ footer a {
   display: grid;
   grid-template-columns: 7fr 2fr 1fr;
   align-items: center;
-  width: 21rem;
+  /* width: 21rem; */
 }
 @media (max-width: 750px) {
   .panel-fighters {
@@ -305,7 +306,7 @@ footer a {
     padding: .5rem 0;
   }
   .fighter {
-    width: 95%;
+    /* width: 95%; */
     margin-left: 1rem;
   }
 }
@@ -463,7 +464,7 @@ footer a {
 /* PANEL LIFE */
 .panel-life {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-around;
   flex-wrap: wrap;
   gap: 1rem;
   padding: .5rem 1.5rem;
@@ -495,7 +496,7 @@ footer a {
 .life-0 { color: white; background-color: var(--colorLife000);}
 
 .life-name {
-  width: 10rem;
+  width: 14rem;
   text-align: right;
   padding-right: .5rem;
   font-weight: bold;
@@ -516,12 +517,12 @@ footer a {
   cursor: pointer;
 }
 .life-value {
-  width: 2rem;
+  width: 3rem;
   text-align: center;
   padding: .2rem;
 }
 .life-total {
-  width: 2rem;
+  width: 3rem;
   text-align: center;
   font-weight: 900;
   padding: .2rem;
@@ -544,13 +545,13 @@ footer a {
 .shld-0 { border-color: var(--colorShld000);}
 
 .shld-value {
-  width: 2rem;
+  width: 3rem;
   text-align: center;
   padding: .2rem;
   color: var(--colorShld005);
 }
 .shld-total {
-  width: 2rem;
+  width: 3rem;
   text-align: center;
   font-weight: 900;
   padding: .2rem;

@@ -332,7 +332,13 @@ const standardStates = [
     name: 'Zero-imbuido',
     desc: 'Recibe un penalizador de -1 a TS contra poderes bióticos y sus escudos no pueden recuperar puntos de golpe ni ser reactivados. No se conocen mecanismos para dejar de estar en este estado.',
     inca: false
-  }  
+  },
+  {
+    icon: 27,
+    name: 'Recarga de poder',
+    desc: 'No puede utilizar poderes. Se están recargando.',
+    inca: false
+  } 
 ]
 class state {
   constructor( iIcon,
@@ -1270,7 +1276,7 @@ function formAddState(oFighter, type){
                                   iName[2].value, 
                                   iDesc[2].value, 
                                   iChbx[1].checked, 
-                                  iNTrn[2].value, 
+                                  (type===27?parseInt(iNTrn[2].value)+1:iNTrn[2].value), 
                                   oFighter.sFullName());
       oFighter.states.push(newState);
       formEditFighter(oFighter);
