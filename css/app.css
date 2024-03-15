@@ -20,6 +20,8 @@
   --colorShld025: #3600b3; 
   --colorShld005: #000985; 
   --colorShld000: #000000; 
+  /* velocidad de las animaciones */
+  --durButtonActive: 0.1s;
 }
 /* Imprescindibles */
 html {
@@ -141,7 +143,7 @@ footer a {
   margin: .5rem auto; 
   color: var(--colorSec);
   background-color: var(--colorPri);
-  transition-duration: 0.2s;
+  transition-duration: var(--durButtonActive);
   transition-property: transform, color, background-color;
 }
 .btn:active {
@@ -327,7 +329,7 @@ footer a {
   border-left: .2rem solid var(--colorPri);
   background: var(--colorPri);
   color: var(--colorSec);
-  transition-duration: 0.2s;
+  transition-duration: var(--durButtonActive);
   transition-property: color, background-color;
 }
 .fighter-adds:active {
@@ -371,7 +373,7 @@ footer a {
   color: var(--colorPri);
   font-weight: bold;
   cursor: default;
-  transition-duration: 0.2s;
+  transition-duration: var(--durButtonActive);
   transition-property: color;
 }
 @media (max-width: 750px) {
