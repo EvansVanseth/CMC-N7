@@ -139,6 +139,11 @@ footer a {
   padding: .3rem 1rem;
   /* max-width: 90%; */
   margin: .5rem auto; 
+  transition-duration: 0.2s;
+  transition-property: transform;
+}
+.btn:hover {
+  transform: scale(.98);
 }
 
 /* -------------------------------------------------------- */
