@@ -139,11 +139,15 @@ footer a {
   padding: .3rem 1rem;
   /* max-width: 90%; */
   margin: .5rem auto; 
+  color: var(--colorSec);
+  background-color: var(--colorPri);
   transition-duration: 0.2s;
-  transition-property: transform;
+  transition-property: transform, color, background-color;
 }
 .btn:hover {
   transform: scale(.98);
+  color: var(--colorPri);
+  background-color: var(--colorTer);
 }
 
 /* -------------------------------------------------------- */
@@ -257,12 +261,6 @@ footer a {
   /* min-width: 4rem; */
   margin: 0 auto; 
   margin-left: 1rem;
-  color: var(--colorSec);
-  background-color: var(--colorPri);
-}
-.mark-btn:hover {
-  color: var(--colorPri);
-  background-color: var(--colorTer);
 }
 .mark-opt-btn {
   font-weight: bold;
@@ -270,10 +268,6 @@ footer a {
   margin: 1rem;
   color: var(--colorSec);
   background-color: var(--colorPri);
-}
-.mark-opt-btn:hover {
-  color: var(--colorPri);
-  background-color: var(--colorTer);
 }
 /* -------------------------------------------------------- */
 /* COMUN A PANELES */
@@ -358,12 +352,6 @@ footer a {
   font-weight: bold;
   /* width: 10rem; */
   margin-left: 1rem;
-  color: var(--colorSec);
-  background-color: var(--colorPri);
-}
-.next-turn-btn:hover{
-  color: var(--colorPri);
-  background-color: var(--colorTer);  
 }
 
 .panel-initiative {
@@ -675,12 +663,6 @@ footer a {
 }
 .form-button {
   margin: 1rem 0 .5rem 1rem;
-  background-color: var(--colorPri);
-  color: var(--colorSec);
-}
-.form-button:hover {
-  background-color: var(--colorTer);
-  color: var(--colorPri)
 }
 .form-input-checkbox {
   appearance: none;
