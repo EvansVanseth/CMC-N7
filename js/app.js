@@ -1210,7 +1210,7 @@ function formShieldFighter(oFighter){
   pExp2.classList.add("form-details-text");
   pExp2.innerHTML = "Un valor negativo reducirá los escudos esa cantidad";
 
-  const cbMass = formCheckBox("Daño masivo","id-dano-masivo");
+  const cbMass = formCheckBox("Sobrepasa escudos","id-dano-masivo");
   
   const divB = formButtons(1, ["ACEPTAR"], [
     ()=>{ divOpac[0].remove(); modShldFighter(oFighter, iDano[2].value, cbMass[1].checked); }
@@ -1225,6 +1225,7 @@ function formShieldFighter(oFighter){
   divOpac[1].appendChild(pExp1);
   divOpac[1].appendChild(pExp2);
   divOpac[1].appendChild(cbMass[0]);
+  divOpac[1].appendChild(formText("Activa esta casilla si los escudos han sufrido un daño que afectará también a la vida (Daño MASIVO, CRITICO y COMBINACION DE PODERES."));
   divOpac[1].appendChild(divB[0]);
   HTMLMain.appendChild(divOpac[0]);
 };

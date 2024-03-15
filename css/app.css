@@ -701,6 +701,7 @@ footer a {
   font-size: 1.2rem;
   text-align: center;
   margin: 0 auto;
+  WIDTH: 90%;
 }
 .form-select {
   border: .2rem solid var(--colorPri);
