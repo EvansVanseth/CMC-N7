@@ -75,8 +75,8 @@ function loadLocal(){
     newFighter.iSH = element.iSH;
     newFighter.iShld = element.iShld;
     newFighter.iRS = element.iRS;
-    newFighter.bBL = element.bBL;
-    newFighter.bBS = element.bBS;
+    newFighter.iBL = element.iBL;
+    newFighter.iBS = element.iBS;
     newFighter.iDesEmpInit = element.iDesEmpInit;
     newFighter.iControlInit = element.iControlInit;
     element.states.forEach(eleState => {
@@ -85,7 +85,9 @@ function loadLocal(){
                                eleState.sDesc,
                                eleState.bInca,
                                eleState.iTurnos,
-                               newFighter.sFullName());
+                               newFighter.sFullName(),
+                               eleState.iInit,
+                               eleState.fighterDone);
       newFighter.states.push(newState);
     });
     
@@ -110,14 +112,11 @@ function updateTurn(){
   showInitiative();
   saveLocal();
 };
+
 function findNextFighter(){
   const promise = new Promise((resolve, reject) => {
     let fighterFind = "";
     if(FightersList.length>0) {
-      if(TurnControl.fighterName && TurnControl.fighterName!=="") {
-        console.log("entra aqui");
-        getFighterByName(TurnControl.fighterName).endTurn();
-      }
       htmlBtnTurno.innerHTML = "SIGUIENTE";
       console.log(TurnControl.mode);
       if(TurnControl.mode===0) {
@@ -129,11 +128,26 @@ function findNextFighter(){
         do {
           if(TurnControl.fighterPos < InitiativeList[InitiativeList.length-1].iControlInit) {
               TurnControl.fighterPos = InitiativeList[0].iControlInit + 1;
+              // Si encuentra un estado con iTurnos a 0 i que la iInit es
+              // superior al primer combatiente, elimina esos estados
+              FightersList.forEach(oFighter => {
+                oFighter.states.forEach(oState => {
+                  if(oState.iInit > TurnControl.fighterPos) oState.iTurnos--;
+                  if(oState.iTurnos <= 0) oFighter.cleanStates();
+                })
+              });
               TurnControl.fighterName = "";
               TurnControl.turno++;
             } else {
               TurnControl.fighterPos--;
               fighterFind = getFighterByInit(TurnControl.fighterPos);
+              /** Busca todos los estados que los haya causado esta iniciativa */
+              FightersList.forEach(oFighter => {
+                oFighter.states.forEach(oState => {
+                  if(oState.iInit === TurnControl.fighterPos) oState.iTurnos--;
+                  if(oState.iTurnos <= 0) oFighter.cleanStates();
+                })
+              });
             }
           } while (fighterFind==="");
           TurnControl.fighterName = fighterFind;
@@ -318,8 +332,8 @@ const standardStates = [
   {
     icon: 24,
     name: 'Electrizado',
-    desc: 'Una criatura electrizada no puede realizar ninguna acción. si falla un TS de Voluntad. Si salva el TS, sigue electrizada, pero puede  intentar descargarse.',
-    inca: true
+    desc: 'Una criatura electrizada no puede realizar ninguna acción si falla un TS de Voluntad. Si salva el TS, sigue electrizada, pero puede  intentar descargarse.',
+    inca: false
   },
   {
     icon: 25,
@@ -345,14 +359,39 @@ class state {
                sName,
                sDesc,
                bInca,
-               iTurnos,
-               fighterName) {
+               iTurnos,               
+               fighterName,
+               iInit,
+               fighterDone) {
     this.iIcon = iIcon;
     this.sName = sName;
     this.sDesc = sDesc;
     this.bInca = bInca;
     this.iTurnos = iTurnos;
     this.fighterName = fighterName;
+    /** <iInit> momento de la iniciativa en la que dejarà
+     * de estar en el estado alterado
+     */
+    this.iInit = iInit;
+    /** <FighterDone> es el nombre del fighter que estaba
+     * en iniciativa quando se le ha puesto el estado
+     * alterado. Si se modifica el estado alterado, se
+     * selecciona al fighter, pero en realidad el valor que 
+     * se necesita es el valor iControlInit, que determina
+     * en qué momento el estado dejará de surtir efecto, dato
+     * que guardaremos en iInit
+     */
+    this.fighterDone = fighterDone;
+  }
+  sFormatedInit() {
+    let iD = 0;
+    let iB = 0;
+    let iT = 0;
+    if(this.iInit===undefined) this.iInit = 0;
+    iT = Math.floor(this.iInit / 1000000)
+    iB = Math.floor((this.iInit-iT*1000000)/1000)
+    iD = this.iInit-iT*1000000-iB*1000
+    return `${iT-100}.${iB-100}.${iD}`
   }
   showStateInEdit(divOpac){
     const divS = document.createElement("div");
@@ -369,7 +408,7 @@ class state {
     divE.addEventListener("click", ()=>{
       divOpac.remove();
       const oFighter = getFighterByName(this.fighterName);
-      formEditState(oFighter, this, this.iIcon);
+      formEditState(oFighter, this, this.iIcon, this.fighterDone);
     })
     const divD = document.createElement("div");
     divD.classList.add("state-delete");
@@ -379,9 +418,12 @@ class state {
       oFighter.states = oFighter.states.filter(e => e!==this);
       formEditFighter(oFighter);
     })
+    if(this.fighterDone===undefined) this.fighterDone=''
     const pDesc = document.createElement("p");
     pDesc.classList.add("state-desc");
-    pDesc.innerHTML = `${this.sDesc}`;    
+    pDesc.innerHTML = `Causante: ${this.fighterDone} (${this.sFormatedInit()})<BR>
+                      ${this.sDesc}`;    
+    pDesc.innerHTML = `Causante: ${this.fighterDone} (${this.sFormatedInit()})`;    
     
     divS.appendChild(pName);
     divS.appendChild(pTurn);
@@ -405,7 +447,8 @@ class state {
     
     const pDesc = document.createElement("p");
     pDesc.classList.add("state-desc");
-    pDesc.innerHTML = `${this.sDesc}`;    
+    pDesc.innerHTML = `Causante: ${this.fighterDone} (${this.sFormatedInit()})<br>
+                                 ${this.sDesc}`;     
     
     divS.appendChild(pName);
     divS.appendChild(pTurn);
@@ -431,8 +474,8 @@ class fighter {
                iPG,
                iSH,
                iRS,
-               bBL,
-               bBS
+               iBL,
+               iBS
                ) {
     this.sName = sName;
     this.iInit_bon = 0;
@@ -440,8 +483,8 @@ class fighter {
     this.iBono_control = 0;
     this.iInit_control = 0;
     this.bPje = bPje;
-    this.bBL = bBL;
-    this.bBS = bBS;
+    this.iBL = iBL;
+    this.iBS = iBS;
     this.iNumRep = iNumRep;
     this.iPG = iPG;
     this.iLife = iPG;
@@ -463,6 +506,9 @@ class fighter {
   sInitiative(){
     if (AppTestMode) return `${this.iInit_value}.${this.iInit_bon}.${this.iDesEmpInit}`;
     return `${this.iInit_value}`;
+  };
+  sInitiativeLarge(){
+    return `${this.iInit_value}.${this.iInit_bon}.${this.iDesEmpInit}`;
   };
   UpdateControlInit(){
     this.iControlInit = (this.iInit_control * 1000000) +
@@ -506,7 +552,9 @@ class fighter {
       standardStates[20].desc, 
       standardStates[20].inca, 
       2, 
-      this.sFullName());
+      this.sFullName(),
+      TurnControl.fighterPos,
+      TurnControl.fighterName);
     this.states.push(newState);
     /* Marea al combatiente si el daño que rompe
        los escudos es superior a la mitad de sus
@@ -518,7 +566,9 @@ class fighter {
         standardStates[16].desc, 
         standardStates[16].inca, 
         1, 
-        this.sFullName());
+        this.sFullName(),
+        TurnControl.fighterPos,
+        TurnControl.fighterName);
       this.states.push(newState);
     }
   }
@@ -606,19 +656,6 @@ class fighter {
   }
   // elemento HTML para CONTROL DE DAÑOS
   showInLife(parent) {
-    /*
-      <div class="life-fighter">
-        <div class="life-name">Bandido 1</div>
-        <div class="life-tupla life-100">
-          <div class="life-value">12</div>
-          <div class="life-total">15</div>
-        </div> 
-        <div class="life-tupla shld-90">
-          <div class="shld-value">12</div>
-          <div class="shld-total">15</div>
-        </div> 
-      </div>     
-    */
     if(this.bPje) return;
     const divF = document.createElement("div");
     divF.classList.add(`life-fighter`);  
@@ -633,7 +670,7 @@ class fighter {
     /* Shields */
     const divBS = document.createElement("div"); 
     divBS.classList.add("mark-blinded");
-    if(this.bBS) divBS.classList.add("blinded");
+    if(this.iBS>0) divBS.classList.add("blinded");
     const divSF = document.createElement("div"); 
     divSF.classList.add(`shld-tupla`);
     if(this.shieldsSaturated()) this.iShld = 0;
@@ -660,7 +697,7 @@ class fighter {
     /* Life */
     const divBL = document.createElement("div"); 
     divBL.classList.add("mark-blinded");
-    if(this.bBL) divBL.classList.add("blinded");
+    if(this.iBL>0) divBL.classList.add("blinded");
     const divLF = document.createElement("div"); 
     divLF.classList.add(`life-tupla`);
     const divL = document.createElement("div");
@@ -702,15 +739,9 @@ class fighter {
       this.iShld = Math.min(this.iShld, this.iSH);
     }
   }
-  endTurn(){
-    // Reduce en uno los turnos restantes de cada estado
-    this.states.forEach((s) => {
-      s.iTurnos--;
-    })
-    // Elimina los estados que han llegado a 0
-    this.states = this.states.filter(s => s.iTurnos>0);
+  cleanStates(){
+    this.states = this.states.filter(s => s.iTurnos>0)
   }
-
 
 };
 
@@ -818,13 +849,13 @@ function HaveChangedListOrderByName (List1, List2) {
   }
   return false;
 }
-function editFighter(oFighter, sBonoInic, sIniciativa, bBlindedLife, bBlindedShields){
+function editFighter(oFighter, sBonoInic, sIniciativa, iBlindedLife, iBlindedShields){
   const oldInitiative = [...InitiativeList];
   const oldInit = oFighter.iControlInit;
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
-  oFighter.bBL = bBlindedLife;
-  oFighter.bBS = bBlindedShields;
+  oFighter.iBL = iBlindedLife;
+  oFighter.iBS = iBlindedShields;
   InitiativeList.sort(fighter.sortByInit);
   if (oFighter.sFullName() === TurnControl.fighterName) {
     if (HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
@@ -970,6 +1001,19 @@ function formTextInput(Caption, ID, bOnlyNumbers = false){
   div.appendChild(iText);
   return [div,pText,iText];
 };
+function formTextInfoBlindaje(Caption, Text){
+  const div = document.createElement("div");
+  div.classList.add("form-line-group");
+  const pText = document.createElement("p");
+  pText.classList.add("form-textinput-text");
+  pText.innerHTML = Caption;
+  const iText = document.createElement("div");
+  iText.classList.add("form-textinput-input");
+  iText.innerHTML = Text;
+  div.appendChild(pText);
+  div.appendChild(iText);
+  return [div,pText,iText];
+};
 function formMemoInput(Caption, ID){
   const div = document.createElement("div");
   div.classList.add("form-memo-group");
@@ -1042,6 +1086,23 @@ function formSelect (ID, Elements){
   }
   return select;
 }
+function formSelectFighter (ID, Elements){
+  const div = document.createElement("div");
+  div.classList.add("form-select-div");
+  const select = document.createElement("select");
+  select.classList.add("form-select");
+  select.setAttribute("id",ID);
+  
+  for(let i=0;i<Elements.length;i++){
+    const opt = document.createElement("option");
+    opt.setAttribute("value", Elements[i].sFullName());
+    opt.innerHTML = Elements[i].sFullName();
+    select.appendChild(opt);
+  }
+
+  div.appendChild(select);
+  return [div, select];
+}
 function autogrow(element) {
   element.style.height = "5px";
   element.style.height = (element.scrollHeight) + "px";
@@ -1060,8 +1121,8 @@ function formNewFighter(){
   const iInit = formTextInput("Tirada","id-tira-iniciativa",true);
   const iSBli = formSeccion("Blindaje");
   iSBli[2].style.height = "0px";
-  const cBlLf = formCheckBox("Vida","id-blinded-life");
-  const cBlSh = formCheckBox("Escudos","id-blindel-shields");
+  const cBlLf = formTextInput("Vida","id-blinded-life",true);
+  const cBlSh = formTextInput("Escudos","id-blindel-shields",true);
   const iSVid = formSeccion("Vida y escudos");
   iSVid[2].style.height = "0px";
   const iPtGP = formTextInput("Vida (PG)","id-puntos-golpe",true);
@@ -1079,8 +1140,8 @@ function formNewFighter(){
                        iPtGP[2].value,
                        iPtSH[2].value,
                        iPtRS[2].value,
-                       cBlLf[1].checked,
-                       cBlSh[1].checked );}
+                       cBlLf[2].value,
+                       cBlSh[2].value );}
   ]);
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
@@ -1124,8 +1185,8 @@ function formEditFighter(oFighter){
 
   const sBli = formSeccion(`Blindaje`);
   sBli[2].style.height = "0px";
-  const cBlLf = formCheckBox("Vida","id-blinded-life");
-  const cBlSh = formCheckBox("Escudos","id-blindel-shields");
+  const cBlLf = formTextInput("Vida","id-blinded-life",true);
+  const cBlSh = formTextInput("Escudos","id-blindel-shields",true);
 
   const pTSd = formSeccion(`Escudos`);
   pTSd[2].style.height = "0px";
@@ -1160,7 +1221,7 @@ function formEditFighter(oFighter){
   ]);
   divD[0].style.justifyContent = "center";
   const divB = formButtons(1, ["ACEPTAR"], [
-    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value, cBlLf[1].checked, cBlSh[1].checked); }
+    ()=>{ divOpac[0].remove(); editFighter(oFighter, iBono[2].value, iInit[2].value, cBlLf[2].value, cBlSh[2].value); }
   ]);
   divB[0].style.borderTop = ".2rem solid var(--colorPri)";
   divB[0].style.paddingTop = ".3rem";
@@ -1170,8 +1231,8 @@ function formEditFighter(oFighter){
   // LOGICA
   iBono[2].value = `${oFighter.iInit_bon}`;
   iInit[2].value = `${oFighter.iInit_value}`;
-  cBlLf[1].checked = oFighter.bBL;
-  cBlSh[1].checked = oFighter.bBS;
+  cBlLf[2].value = oFighter.iBL;
+  cBlSh[2].value = oFighter.iBS;
 
   //MONTAJE
   divOpac[1].appendChild(pTit[0]);
@@ -1201,6 +1262,8 @@ function formShieldFighter(oFighter){
   // VISUAL
   const pTit = formTitle(`Escudos de ${oFighter.sFullName()}`);
   pTit[2].addEventListener("click", ()=>{ divOpac[0].remove(); });
+  const iBlin = formTextInfoBlindaje("Blindado",oFighter.iBS);
+  iBlin[2].style.backgroundColor = "var(--colorBlinded)"
   const iDano = formTextInput("Modificar (+/-)","id-dano",true);
 
   const pExp1 = document.createElement("p");
@@ -1208,7 +1271,7 @@ function formShieldFighter(oFighter){
   pExp1.innerHTML = "Un valor positivo aumentará los escudos esa cantidad";
   const pExp2 = document.createElement("p");
   pExp2.classList.add("form-details-text");
-  pExp2.innerHTML = "Un valor negativo reducirá los escudos esa cantidad";
+  pExp2.innerHTML = "Un valor negativo reducirá los escudos esa cantidad<hr>";
 
   const cbMass = formCheckBox("Sobrepasa escudos","id-dano-masivo");
   
@@ -1221,6 +1284,7 @@ function formShieldFighter(oFighter){
 
   //MONTAJE
   divOpac[1].appendChild(pTit[0]);
+  if(oFighter.iBS>0) divOpac[1].appendChild(iBlin[0]);
   divOpac[1].appendChild(iDano[0]);
   divOpac[1].appendChild(pExp1);
   divOpac[1].appendChild(pExp2);
@@ -1235,6 +1299,8 @@ function formHealedFighter(oFighter){
   const pTit = formTitle(`Vida de ${oFighter.sFullName()}`);
   pTit[2].addEventListener("click", ()=>{ divOpac[0].remove(); });
   const iDano = formTextInput("Modificar (+/-)","id-dano",true);
+  const iBlin = formTextInfoBlindaje("Blindado",oFighter.iBL);
+  iBlin[2].style.backgroundColor = "var(--colorBlinded)"  
 
   const pExp1 = document.createElement("p");
   pExp1.classList.add("form-details-text");
@@ -1252,6 +1318,7 @@ function formHealedFighter(oFighter){
 
   //MONTAJE
   divOpac[1].appendChild(pTit[0]);
+  if(oFighter.iBL>0) divOpac[1].appendChild(iBlin[0]);
   divOpac[1].appendChild(iDano[0]);
   divOpac[1].appendChild(pExp1);
   divOpac[1].appendChild(pExp2);
@@ -1263,6 +1330,7 @@ function formAddState(oFighter, type){
   if(type===undefined) type = 0;
   const pTit = formSeccion(`Añadir estado alterado a ${oFighter.sFullName()}`);
   pTit[2].addEventListener("click", ()=>{ divOpac[0].remove(); formEditFighter(oFighter); });
+
   const divT = formButtons(1,["SELECCIONAR ESTANDAR"], [()=>{
     divOpac[0].remove(); formSelectStateType(oFighter, null, true);
   }])
@@ -1270,15 +1338,26 @@ function formAddState(oFighter, type){
   const iDesc = formMemoInput("Descripción","id-state-desc");
   const iChbx = formCheckBox("Incapacitante","id-state-donothing");
   const iNTrn = formTextInput("Turnos","id-state-truns",true);
+
+  const pFCa = formSeccion(`Causante`);
+  pFCa[2].style.height = "0px";
+  const sCau = formSelectFighter("id-select-fighter",FightersList);
+  if (TurnControl.fighterName!="") sCau[1].value = TurnControl.fighterName;
+
   const divB = formButtons(1, ["ACEPTAR"], [
     ()=>{
       divOpac[0].remove();
+      const oFighterCau = getFighterByName(sCau[1].value);
+      const iInitCau = oFighterCau.iControlInit;
+      console.log(sCau[1].value, iInitCau);
       const newState = new state( type, 
                                   iName[2].value, 
                                   iDesc[2].value, 
                                   iChbx[1].checked, 
                                   (type===27?parseInt(iNTrn[2].value)+1:iNTrn[2].value), 
-                                  oFighter.sFullName());
+                                  oFighter.sFullName(),
+                                  iInitCau,
+                                  oFighterCau.sFullName());
       oFighter.states.push(newState);
       formEditFighter(oFighter);
     }
@@ -1302,11 +1381,13 @@ function formAddState(oFighter, type){
   divOpac[1].appendChild(iDesc[0]);
   divOpac[1].appendChild(iNTrn[0]);
   divOpac[1].appendChild(iChbx[0]);
+  divOpac[1].appendChild(pFCa[0]);
+  divOpac[1].appendChild(sCau[0]);
   divOpac[1].appendChild(divB[0]);
   HTMLMain.appendChild(divOpac[0]);
   autogrow(iDesc[2]);
 };
-function formEditState(oFighter, oState, type){
+function formEditState(oFighter, oState, type, fighterCau){
   const divOpac = formPrep();
   
   const pTit = formSeccion(`Editar estado alterado a ${oFighter.sFullName()}`);
@@ -1318,7 +1399,13 @@ function formEditState(oFighter, oState, type){
   const iDesc = formMemoInput("Descripción","id-state-desc");
   const iChbx = formCheckBox("Incapacitante","id-state-donothing");
   const iNTrn = formTextInput("Turnos","id-state-truns",true);
-  const divB = formButtons(1, ["ACEPTAR","CANCELAR"], [
+
+  const pFCa = formSeccion(`Causante`);
+  pFCa[2].style.height = "0px";
+  const sCau = formSelectFighter("id-select-fighter",FightersList);
+  if (fighterCau!="") sCau[1].value = fighterCau;
+  
+  const divB = formButtons(1, ["ACEPTAR"], [
     ()=>{
       divOpac[0].remove();
       oState.iIcon   = type;
@@ -1326,6 +1413,8 @@ function formEditState(oFighter, oState, type){
       oState.sDesc   = iDesc[2].value;
       oState.bInca   = iChbx[1].checked;
       oState.iTurnos = parseInt(iNTrn[2].value);
+      oState.iInit   = getFighterByName(sCau[1].value).iControlInit;
+      oState.fighterDone = sCau[1].value;
       formEditFighter(oFighter);
     }
   ])
@@ -1353,6 +1442,8 @@ function formEditState(oFighter, oState, type){
   divOpac[1].appendChild(iDesc[0]);
   divOpac[1].appendChild(iNTrn[0]);
   divOpac[1].appendChild(iChbx[0]);
+  divOpac[1].appendChild(pFCa[0]);
+  divOpac[1].appendChild(sCau[0]);  
   divOpac[1].appendChild(divB[0]);
   HTMLMain.appendChild(divOpac[0]);
   autogrow(iDesc[2]);

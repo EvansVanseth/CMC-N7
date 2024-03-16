@@ -20,6 +20,7 @@
   --colorShld025: #3600b3; 
   --colorShld005: #000985; 
   --colorShld000: #000000; 
+  --colorBlinded: #ff7525;
   /* velocidad de las animaciones */
   --durButtonActive: 0.1s;
 }
@@ -283,9 +284,9 @@ footer a {
 .panel-fighters {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: start;
   gap: 1rem;
-  padding: .5rem 1.5rem;
+  padding: .5rem .5rem;
 }
 .fighters-title {
   cursor: pointer;
@@ -302,11 +303,11 @@ footer a {
 }
 @media (max-width: 750px) {
   .panel-fighters {
-    /* gap: .5rem; */
+    gap: .5rem;
     padding: .5rem 0;
   }
   .fighter {
-    /* width: 95%; */
+    width: 95%;
     margin-left: 1rem;
   }
 }
@@ -344,7 +345,7 @@ footer a {
   flex-direction: row;
   align-items: stretch;
   gap: 1rem;
-  padding: .5rem 1.5rem;  
+  padding: .5rem .5rem;  
 }
 /* -------------------------------------------------------- */
 /* PANEL INITIATIVE */
@@ -402,16 +403,16 @@ footer a {
 .init-value {
   text-align: right;
   padding-right: 1rem;
-  width: 3.3rem;
+  width: 3rem;
 }
 .init-name {
- font-size: 1.8rem;
- margin-right: .4rem;
+ font-size: 1.6rem;
+ margin-right: .2rem;
  cursor: pointer;
 }
 .init-state {
   width: 1.6rem;
-  margin: 0 0 0 .3rem;
+  margin: 0 0 0 .2rem;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: top;
@@ -464,10 +465,10 @@ footer a {
 /* PANEL LIFE */
 .panel-life {
   display: flex;
-  justify-content: space-around;
+  justify-content: start;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: .5rem 1.5rem;
+  padding: .5rem .5rem;
 }
 
 .life-fighter {
@@ -496,7 +497,7 @@ footer a {
 .life-0 { color: white; background-color: var(--colorLife000);}
 
 .life-name {
-  width: 14rem;
+  width: 18rem;
   text-align: right;
   padding-right: .5rem;
   font-weight: bold;
@@ -509,7 +510,7 @@ footer a {
 }
 .life-tupla {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: speace-evnly;
   border: .2rem solid var(--colorPri);
   border-radius: 1rem;
   gap: .2rem;
@@ -566,7 +567,7 @@ footer a {
   padding: 0.1rem;
 }
 .blinded {
-  border: .3rem solid #ff7525;
+  border: .3rem solid var(--colorBlinded);
 }
 
 /* -------------------------------------------------------- */
@@ -702,6 +703,11 @@ footer a {
   text-align: center;
   margin: 0 auto;
   WIDTH: 90%;
+}
+.form-select-div {
+  display: flex;
+  justify-content: end;
+  width: 93%;
 }
 .form-select {
   border: .2rem solid var(--colorPri);
