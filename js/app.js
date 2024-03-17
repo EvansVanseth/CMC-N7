@@ -14,7 +14,7 @@ const defaultCombat = {
 }
 const AppData = {
   selected: 0,
-  combats: [defaultCombat]
+  combats: [{...defaultCombat}]
 };
 /** Elementos HTML */
 let htmlInpNomCo = null;
@@ -22,9 +22,8 @@ let htmlNumTurno = null;
 let htmlBtnTurno = null;
 let htmlStatsData = null;
 let htmlLogoDado = null;
-function newCombat(){
-  const newCombat = {...defaultCombat}
-  AppData.combats.push(newCombat);
+function newCombat(){ 
+  AppData.combats.push({...defaultCombat});
   AppData.selected = AppData.combats.length - 1;
   htmlBtnTurno.innerHTML = "INICIAR";
   updateTurn();
