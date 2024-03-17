@@ -1,158 +1,200 @@
 /** Elemento HTML global */
 let HTMLMain;
-/** Listas de la aplicación */
-let FightersList = new Array();
-let InitiativeList = new Array();
-let LifeList = new Array();
-let LoadList = new Array();
-/** Control de turnos */
-let TurnControl = {
-  turno: 0,
-  fighterPos: 99999999,
-  fighterName: "",
-  mode: 0 //0:Preparando, 1:Iniciado
+const defaultCombat = {
+  FightersList:  [],
+  InitiativeList: [],
+  LifeList: [],
+  TurnControl: {
+    turno: 0,
+    fighterPos: 999999999,
+    fighterName: "",
+    mode: 0,
+    nombre: "Nuevo combate"
+  }
+}
+const AppData = {
+  selected: 0,
+  combats: [defaultCombat]
 };
+/** Elementos HTML */
+let htmlInpNomCo = null;
 let htmlNumTurno = null;
 let htmlBtnTurno = null;
 let htmlStatsData = null;
 let htmlLogoDado = null;
 function newCombat(){
-  if(InitiativeList.length === 0) return;
-  if (!confirm(`Esta acción eliminará todos los combatientes y reiniciará el combate entero.
-  
-  ¿Quieres hacerlo igualmente?`)) return;
-  FightersList.splice(0, FightersList.length);
-  InitiativeList.splice(0, InitiativeList.length);
-  LifeList.splice(0, LifeList.length);
-  FightersList.length = 0;
-  InitiativeList.length = 0;
-  LifeList.length = 0;
-  TurnControl.turno = 0;
-  TurnControl.fighterPos = 999999999;
-  TurnControl.fighterName = "";
-  TurnControl.mode = 0;
+  const newCombat = {...defaultCombat}
+  AppData.combats.push(newCombat);
+  AppData.selected = AppData.combats.length - 1;
   htmlBtnTurno.innerHTML = "INICIAR";
   updateTurn();
 };
 function clearCombat(){
-  if(TurnControl.mode === 0) return;
-  if (!confirm(`Esta acción reiniciará el combate.
+  if (AppData.combats[AppData.selected].InitiativeList.length === 0) return;
+  if (!confirm(`Esta acción eliminará todos los combatientes y reiniciará el combate entero.
   
   ¿Quieres hacerlo igualmente?`)) return;
-  TurnControl.turno = 0;
-  if(InitiativeList.length>0) {
-    TurnControl.fighterName = InitiativeList[0].sFullName();
-    TurnControl.fighterPos = InitiativeList[0].iControlInit;
-  } else 
-  TurnControl.fighterName = "";
-  TurnControl.fighterPos = 999999999;
-  TurnControl.mode = 0;
+  AppData.combats[AppData.selected].FightersList.splice(0, AppData.combats[AppData.selected].FightersList.length);
+  AppData.combats[AppData.selected].InitiativeList.splice(0, AppData.combats[AppData.selected].InitiativeList.length);
+  AppData.combats[AppData.selected].LifeList.splice(0, AppData.combats[AppData.selected].LifeList.length);
+  AppData.combats[AppData.selected].FightersList.length = 0;
+  AppData.combats[AppData.selected].InitiativeList.length = 0;
+  AppData.combats[AppData.selected].LifeList.length = 0;
+  AppData.combats[AppData.selected].TurnControl.turno = 0;
+  AppData.combats[AppData.selected].TurnControl.fighterPos = 999999999;
+  AppData.combats[AppData.selected].TurnControl.fighterName = "";
+  AppData.combats[AppData.selected].TurnControl.mode = 0;
   htmlBtnTurno.innerHTML = "INICIAR";
   updateTurn();
 };
+function restartCombat(){
+  if(AppData.combats[AppData.selected].TurnControl.mode === 0) return;
+  if (!confirm(`Esta acción reiniciará el combate.
+  
+  ¿Quieres hacerlo igualmente?`)) return;
+  AppData.combats[AppData.selected].TurnControl.turno = 0;
+  if(AppData.combats[AppData.selected].InitiativeList.length>0) {
+    AppData.combats[AppData.selected].TurnControl.fighterName = AppData.combats[AppData.selected].InitiativeList[0].sFullName();
+    AppData.combats[AppData.selected].TurnControl.fighterPos = AppData.combats[AppData.selected].InitiativeList[0].iControlInit;
+  } else 
+  AppData.combats[AppData.selected].TurnControl.fighterName = "";
+  AppData.combats[AppData.selected].TurnControl.fighterPos = 999999999;
+  AppData.combats[AppData.selected].TurnControl.mode = 0;
+  htmlBtnTurno.innerHTML = "INICIAR";
+  updateTurn();
+};
+function selectCombat(index){
+  AppData.selected = index;
+  updateTurn();
+};
+function deleteCombat(index){
+  if (AppData.combats.length===1) return;
+  if (index===AppData.combats.length - 1) 
+    AppData.selected = AppData.combats.length - 2;
+  AppData.combats.splice(index, 1);
+  updateTurn();
+};
 function saveLocal(){
-  localStorage.setItem("cmc-turn-cont", JSON.stringify(TurnControl));
-  localStorage.setItem("cmc-figh-list", JSON.stringify(FightersList));
-  localStorage.setItem("cmc-init-list", JSON.stringify(InitiativeList));
-  localStorage.setItem("cmc-life-list", JSON.stringify(LifeList));
+  localStorage.setItem("cmc-combats", 
+    JSON.stringify(AppData));
 }
 function loadLocal(){
-  if(localStorage.getItem("cmc-turn-cont")!=null)
-    TurnControl = JSON.parse(localStorage.getItem("cmc-turn-cont"));
-  if(localStorage.getItem("cmc-figh-list")!=null)
-    LoadList = JSON.parse(localStorage.getItem("cmc-figh-list"));
-  LoadList.forEach(element => {
-    const newFighter = new fighter("A", "0", "0", false, 0, 0);
-    newFighter.sName = element.sName;
-    newFighter.iInit_bon = element.iInit_bon;
-    newFighter.iInit_value = element.iInit_value;
-    newFighter.iBono_control = element.iBono_control;
-    newFighter.iInit_control = element.iInit_control;
-    newFighter.bPje = element.bPje;
-    newFighter.iNumRep = element.iNumRep;
-    newFighter.iPG = element.iPG;
-    newFighter.iLife = element.iLife;
-    newFighter.iSH = element.iSH;
-    newFighter.iShld = element.iShld;
-    newFighter.iRS = element.iRS;
-    newFighter.iBL = element.iBL;
-    newFighter.iBS = element.iBS;
-    newFighter.iDesEmpInit = element.iDesEmpInit;
-    newFighter.iControlInit = element.iControlInit;
-    element.states.forEach(eleState => {
-      const newState = new state(eleState.iIcon,
-                               eleState.sName,
-                               eleState.sDesc,
-                               eleState.bInca,
-                               eleState.iTurnos,
-                               newFighter.sFullName(),
-                               eleState.iInit,
-                               eleState.fighterDone);
-      newFighter.states.push(newState);
-    });
-    
-    FightersList.push(newFighter);
-    InitiativeList.push(newFighter);
-    LifeList.push(newFighter);
-  })
-  InitiativeList.sort(fighter.sortByInit);
-  LifeList.sort(fighter.sortByName);
+  let jsonAppData;
+  if(localStorage.getItem("cmc-combats")!=null) {
+    jsonAppData = JSON.parse(localStorage.getItem("cmc-combats"));
+      AppData.selected = jsonAppData.selected;
+      AppData.combats = []
+      console.log("todos los combates", jsonAppData)
+      jsonAppData.combats.forEach((loadedCombat, index) => {
+        console.log(`Combate ${index}`, jsonAppData.combats[index])
+        const newCombat = {
+          FightersList:  [],
+          InitiativeList: [],
+          LifeList: [],
+          TurnControl: loadedCombat.TurnControl
+        }
+        htmlInpNomCo.value = loadedCombat.TurnControl.nombre
+        loadedCombat.FightersList.forEach(element => {
+          const newFighter = new fighter("A", "0", "0", false, 0, 0);
+          newFighter.sName = element.sName;
+          newFighter.iInit_bon = element.iInit_bon;
+          newFighter.iInit_value = element.iInit_value;
+          newFighter.iBono_control = element.iBono_control;
+          newFighter.iInit_control = element.iInit_control;
+          newFighter.bPje = element.bPje;
+          newFighter.iNumRep = element.iNumRep;
+          newFighter.iPG = element.iPG;
+          newFighter.iLife = element.iLife;
+          newFighter.iSH = element.iSH;
+          newFighter.iShld = element.iShld;
+          newFighter.iRS = element.iRS;
+          newFighter.iBL = element.iBL;
+          newFighter.iBS = element.iBS;
+          newFighter.iDesEmpInit = element.iDesEmpInit;
+          newFighter.iControlInit = element.iControlInit;
+          element.states.forEach(eleState => {
+            const newState = new state(eleState.iIcon,
+                                     eleState.sName,
+                                     eleState.sDesc,
+                                     eleState.bInca,
+                                     eleState.iTurnos,
+                                     newFighter.sFullName(),
+                                     eleState.iInit,
+                                     eleState.fighterDone);
+            newFighter.states.push(newState);
+          });
+          
+          newCombat.FightersList.push(newFighter);
+          newCombat.InitiativeList.push(newFighter);
+          newCombat.LifeList.push(newFighter);
+        })
+        newCombat.InitiativeList.sort(fighter.sortByInit);
+        newCombat.LifeList.sort(fighter.sortByName);        
+        AppData.combats.push(newCombat);
+      });  
+  }
 }
+function changeCombatTitle(){
+  console.log(htmlInpNomCo.value);
+  AppData.combats[AppData.selected].TurnControl.nombre = htmlInpNomCo.value;
+  updateTurn();
+};
 function updateTurn(){
-  if(TurnControl.mode===0) {
-    TurnControl.fighterName = "";
-    TurnControl.fighterPos = 999999999;
+  if(AppData.combats[AppData.selected].TurnControl.mode===0) {
+    AppData.combats[AppData.selected].TurnControl.fighterName = "";
+    AppData.combats[AppData.selected].TurnControl.fighterPos = 999999999;
     htmlNumTurno.innerHTML = "Prep.";
   } else {
-    htmlNumTurno.innerHTML = `${TurnControl.turno}`;
+    htmlNumTurno.innerHTML = `${AppData.combats[AppData.selected].TurnControl.turno}`;
   }
   console.log("actualizamos ventana");
   showFighters();
   showLife();
   showInitiative();
+  showCombats();
   saveLocal();
 };
 
 function findNextFighter(){
   const promise = new Promise((resolve, reject) => {
     let fighterFind = "";
-    if(FightersList.length>0) {
+    if(AppData.combats[AppData.selected].FightersList.length>0) {
       htmlBtnTurno.innerHTML = "SIGUIENTE";
-      console.log(TurnControl.mode);
-      if(TurnControl.mode===0) {
-        TurnControl.mode = 1;
-        TurnControl.fighterPos = InitiativeList[0].iControlInit;
-        TurnControl.fighterName = InitiativeList[0].sFullName();
-        if (InitiativeList[0].checkStates()) nextFighter();
+      console.log(AppData.combats[AppData.selected].TurnControl.mode);
+      if(AppData.combats[AppData.selected].TurnControl.mode===0) {
+        AppData.combats[AppData.selected].TurnControl.mode = 1;
+        AppData.combats[AppData.selected].TurnControl.fighterPos = AppData.combats[AppData.selected].InitiativeList[0].iControlInit;
+        AppData.combats[AppData.selected].TurnControl.fighterName = AppData.combats[AppData.selected].InitiativeList[0].sFullName();
+        if (AppData.combats[AppData.selected].InitiativeList[0].checkStates()) nextFighter();
       } else {
         do {
-          if(TurnControl.fighterPos < InitiativeList[InitiativeList.length-1].iControlInit) {
-              TurnControl.fighterPos = InitiativeList[0].iControlInit + 1;
+          if(AppData.combats[AppData.selected].TurnControl.fighterPos < AppData.combats[AppData.selected].InitiativeList[AppData.combats[AppData.selected].InitiativeList.length-1].iControlInit) {
+              AppData.combats[AppData.selected].TurnControl.fighterPos = AppData.combats[AppData.selected].InitiativeList[0].iControlInit + 1;
               // Si encuentra un estado con iTurnos a 0 i que la iInit es
               // superior al primer combatiente, elimina esos estados
-              FightersList.forEach(oFighter => {
+              AppData.combats[AppData.selected].FightersList.forEach(oFighter => {
                 oFighter.states.forEach(oState => {
-                  if(oState.iInit > TurnControl.fighterPos) oState.iTurnos--;
+                  if(oState.iInit > AppData.combats[AppData.selected].TurnControl.fighterPos) oState.iTurnos--;
                   if(oState.iTurnos <= 0) oFighter.cleanStates();
                 })
               });
-              TurnControl.fighterName = "";
-              TurnControl.turno++;
+              AppData.combats[AppData.selected].TurnControl.fighterName = "";
+              AppData.combats[AppData.selected].TurnControl.turno++;
             } else {
-              TurnControl.fighterPos--;
-              fighterFind = getFighterByInit(TurnControl.fighterPos);
+              AppData.combats[AppData.selected].TurnControl.fighterPos--;
+              fighterFind = getFighterByInit(AppData.combats[AppData.selected].TurnControl.fighterPos);
               /** Busca todos los estados que los haya causado esta iniciativa */
-              FightersList.forEach(oFighter => {
+              AppData.combats[AppData.selected].FightersList.forEach(oFighter => {
                 oFighter.states.forEach(oState => {
-                  if(oState.iInit === TurnControl.fighterPos) oState.iTurnos--;
+                  if(oState.iInit === AppData.combats[AppData.selected].TurnControl.fighterPos) oState.iTurnos--;
                   if(oState.iTurnos <= 0) oFighter.cleanStates();
                 })
               });
             }
           } while (fighterFind==="");
-          TurnControl.fighterName = fighterFind;
-          console.log(TurnControl.fighterName);
-          getFighterByName(TurnControl.fighterName).startTurn();
+          AppData.combats[AppData.selected].TurnControl.fighterName = fighterFind;
+          console.log(AppData.combats[AppData.selected].TurnControl.fighterName);
+          getFighterByName(AppData.combats[AppData.selected].TurnControl.fighterName).startTurn();
           if (getFighterByName(fighterFind).checkStates()) nextFighter();
       }
       resolve();
@@ -553,8 +595,8 @@ class fighter {
       standardStates[20].inca, 
       2, 
       this.sFullName(),
-      TurnControl.fighterPos,
-      TurnControl.fighterName);
+      AppData.combats[AppData.selected].TurnControl.fighterPos,
+      AppData.combats[AppData.selected].TurnControl.fighterName);
     this.states.push(newState);
     /* Marea al combatiente si el daño que rompe
        los escudos es superior a la mitad de sus
@@ -567,8 +609,8 @@ class fighter {
         standardStates[16].inca, 
         1, 
         this.sFullName(),
-        TurnControl.fighterPos,
-        TurnControl.fighterName);
+        AppData.combats[AppData.selected].TurnControl.fighterPos,
+        AppData.combats[AppData.selected].TurnControl.fighterName);
       this.states.push(newState);
     }
   }
@@ -626,7 +668,7 @@ class fighter {
     */
     const divF = document.createElement("div");
     divF.classList.add(`init-fighter`);
-    if (TurnControl.fighterName === this.sFullName()) {
+    if (AppData.combats[AppData.selected].TurnControl.fighterName === this.sFullName()) {
       divF.classList.add("init-active");
       if(htmlStatsData!==null) {
         this.states.forEach(stateIn => {
@@ -748,7 +790,7 @@ class fighter {
 /******** Gestión de combatientes ****************/
 function getFighterByInit(iInitValue) {
   let fighterName = "";
-  FightersList.forEach(element => {
+  AppData.combats[AppData.selected].FightersList.forEach(element => {
     if(element.iControlInit === iInitValue && 
        element.iLife > 0 // No selecciona si no está vivo
                          // No selecciona si tiene algún estado alterado que no lo deja actuar
@@ -760,7 +802,7 @@ function getFighterByInit(iInitValue) {
 };
 function getFighterByName(sTestName) {
   let oFighter;
-  FightersList.forEach(element => {
+  AppData.combats[AppData.selected].FightersList.forEach(element => {
     if(element.sFullName() === sTestName) {
       oFighter = element;
     }
@@ -769,7 +811,7 @@ function getFighterByName(sTestName) {
 };
 function getLastFighterByName(sTestName) {
   let fighterNum = 0;
-  FightersList.forEach(element => {
+  AppData.combats[AppData.selected].FightersList.forEach(element => {
     if(element.sName === sTestName) {
       fighterNum = (element.iNumRep>fighterNum ? element.iNumRep : fighterNum);
     }
@@ -779,7 +821,7 @@ function getLastFighterByName(sTestName) {
 };
 function existsFighterByName(sTestName) {
   let retvalue = false;
-  FightersList.forEach(element => {
+  AppData.combats[AppData.selected].FightersList.forEach(element => {
     if(element.bPje && element.sName === sTestName) {
       retvalue = true;
     }
@@ -787,24 +829,24 @@ function existsFighterByName(sTestName) {
   return retvalue;
 };
 function posInitFighterByName(sTestName) {
-  for(let i=0; i<InitiativeList.length;i++) {
-    if (InitiativeList[i].sFullName()===sTestName) {
+  for(let i=0; i<AppData.combats[AppData.selected].InitiativeList.length;i++) {
+    if (AppData.combats[AppData.selected].InitiativeList[i].sFullName()===sTestName) {
       return i;
     }
   }
   return -1;
 };
 function posCombFighterByName(sTestName) {
-  for(let i=0; i<FightersList.length;i++) {
-    if (FightersList[i].sFullName()===sTestName) {
+  for(let i=0; i<AppData.combats[AppData.selected].FightersList.length;i++) {
+    if (AppData.combats[AppData.selected].FightersList[i].sFullName()===sTestName) {
       return i;
     }
   }
   return -1;
 };
 function posLifeFighterByName(sTestName) {
-  for(let i=0; i<LifeList.length;i++) {
-    if (LifeList[i].sFullName()===sTestName) {
+  for(let i=0; i<AppData.combats[AppData.selected].LifeList.length;i++) {
+    if (AppData.combats[AppData.selected].LifeList[i].sFullName()===sTestName) {
       return i;
     }
   }
@@ -833,11 +875,11 @@ function addFighter(bJugador, sNombre, sBonoInic, sIniciativa, bTiradaAuto, sPG,
                                  bBlindedLife,
                                  bBlindedShields);
   if (bTiradaAuto) newFighter.setInit(Math.floor(Math.random()*20)+1+newFighter.iInit_bon);
-  FightersList.push(newFighter);
-  InitiativeList.push(newFighter);
-  InitiativeList.sort(fighter.sortByInit);
-  LifeList.push(newFighter);
-  LifeList.sort(fighter.sortByName);
+  AppData.combats[AppData.selected].FightersList.push(newFighter);
+  AppData.combats[AppData.selected].InitiativeList.push(newFighter);
+  AppData.combats[AppData.selected].InitiativeList.sort(fighter.sortByInit);
+  AppData.combats[AppData.selected].LifeList.push(newFighter);
+  AppData.combats[AppData.selected].LifeList.sort(fighter.sortByName);
   updateTurn();
 };
 function HaveChangedListOrderByName (List1, List2) {
@@ -850,19 +892,19 @@ function HaveChangedListOrderByName (List1, List2) {
   return false;
 }
 function editFighter(oFighter, sBonoInic, sIniciativa, iBlindedLife, iBlindedShields){
-  const oldInitiative = [...InitiativeList];
+  const oldInitiative = [...AppData.combats[AppData.selected].InitiativeList];
   const oldInit = oFighter.iControlInit;
   oFighter.setBono(sBonoInic);
   oFighter.setInit(sIniciativa);
   oFighter.iBL = iBlindedLife;
   oFighter.iBS = iBlindedShields;
-  InitiativeList.sort(fighter.sortByInit);
-  if (oFighter.sFullName() === TurnControl.fighterName) {
-    if (HaveChangedListOrderByName(oldInitiative, InitiativeList)) {
-      if(oldInit > oFighter.iControlInit) TurnControl.fighterName = "";
+  AppData.combats[AppData.selected].InitiativeList.sort(fighter.sortByInit);
+  if (oFighter.sFullName() === AppData.combats[AppData.selected].TurnControl.fighterName) {
+    if (HaveChangedListOrderByName(oldInitiative, AppData.combats[AppData.selected].InitiativeList)) {
+      if(oldInit > oFighter.iControlInit) AppData.combats[AppData.selected].TurnControl.fighterName = "";
       nextFighter();
     } else {
-      TurnControl.fighterPos = oFighter.iControlInit;
+      AppData.combats[AppData.selected].TurnControl.fighterPos = oFighter.iControlInit;
       updateTurn();
     }
   } else {
@@ -870,10 +912,10 @@ function editFighter(oFighter, sBonoInic, sIniciativa, iBlindedLife, iBlindedShi
   }
 };
 function deleteFighter(oFighter){
-  InitiativeList.splice(posInitFighterByName(oFighter.sFullName()),1);
-  FightersList.splice(posCombFighterByName(oFighter.sFullName()),1);
-  LifeList.splice(posLifeFighterByName(oFighter.sFullName()),1);
-  if(TurnControl.fighterName === oFighter.sFullName()) nextFighter();
+  AppData.combats[AppData.selected].InitiativeList.splice(posInitFighterByName(oFighter.sFullName()),1);
+  AppData.combats[AppData.selected].FightersList.splice(posCombFighterByName(oFighter.sFullName()),1);
+  AppData.combats[AppData.selected].LifeList.splice(posLifeFighterByName(oFighter.sFullName()),1);
+  if(AppData.combats[AppData.selected].TurnControl.fighterName === oFighter.sFullName()) nextFighter();
   else updateTurn();
 };
 function modShldFighter(oFighter, sDano, cbMasivo){
@@ -908,7 +950,7 @@ function showFighters(){
   } else {
     HTMLFightersList.parentElement.classList.remove("panel-cerrado");
   }
-  FightersList.forEach(oFighter => { 
+  AppData.combats[AppData.selected].FightersList.forEach(oFighter => { 
     oFighter.showInFighters(HTMLFightersList); 
   });
 };
@@ -919,20 +961,44 @@ function showInitiative(){
   const hF = 32;
   let heightInitPanel = 0;
   if(window.innerWidth >= WidthResponsive) {
-    heightInitPanel = Math.min(InitiativeList.length * hF, 200);
-    if(InitiativeList.length > 12) {
-      heightInitPanel = Math.ceil(InitiativeList.length/2) * hF;
+    heightInitPanel = Math.min(AppData.combats[AppData.selected].InitiativeList.length * hF, 200);
+    if(AppData.combats[AppData.selected].InitiativeList.length > 12) {
+      heightInitPanel = Math.ceil(AppData.combats[AppData.selected].InitiativeList.length/2) * hF;
     } 
   }
-  else heightInitPanel = InitiativeList.length * hF;
+  else heightInitPanel = AppData.combats[AppData.selected].InitiativeList.length * hF;
   HTMLInitiativeList.style.height = `${heightInitPanel}px`;
   
-  InitiativeList.forEach(oFighter => { oFighter.showInInitiative(HTMLInitiativeList) });
+  AppData.combats[AppData.selected].InitiativeList.forEach(oFighter => { oFighter.showInInitiative(HTMLInitiativeList) });
 };
 function showLife(){
   const HTMLLifeList = document.getElementById("life-list");
   HTMLLifeList.innerHTML = "";
-  LifeList.forEach(oFighter => { oFighter.showInLife(HTMLLifeList) });
+  AppData.combats[AppData.selected].LifeList.forEach(oFighter => { oFighter.showInLife(HTMLLifeList) });
+};
+function showCombats(){
+  htmlInpNomCo.value = AppData.combats[AppData.selected].TurnControl.nombre
+  const HTMLCombatList = document.getElementById("combat-list");
+  HTMLCombatList.innerHTML = "";
+  AppData.combats.forEach((combat, index) => {
+    const divFila = document.createElement("div");
+    divFila.classList.add("combat-fila");
+    if(index===AppData.selected) divFila.classList.add("combat-selected");
+    const pTitle = document.createElement("p");
+    pTitle.innerHTML = combat.TurnControl.nombre;
+    pTitle.addEventListener("click", ()=>{
+      selectCombat(index);
+    })
+    const btnEliminar = document.createElement("button")
+    btnEliminar.classList.add("btn")
+    btnEliminar.innerHTML = "ELIMINAR"
+    btnEliminar.addEventListener("click", ()=>{
+      deleteCombat(index);
+    })
+    divFila.appendChild(pTitle);
+    divFila.appendChild(btnEliminar);
+    HTMLCombatList.appendChild(divFila);
+  });
 };
 function checkwindowWidthChange(){
   if (lastwindowwidth+5>WidthResponsive && window.innerWidth<WidthResponsive ||
@@ -1341,8 +1407,8 @@ function formAddState(oFighter, type){
 
   const pFCa = formSeccion(`Causante`);
   pFCa[2].style.height = "0px";
-  const sCau = formSelectFighter("id-select-fighter",FightersList);
-  if (TurnControl.fighterName!="") sCau[1].value = TurnControl.fighterName;
+  const sCau = formSelectFighter("id-select-fighter",AppData.combats[AppData.selected].FightersList);
+  if (AppData.combats[AppData.selected].TurnControl.fighterName!="") sCau[1].value = AppData.combats[AppData.selected].TurnControl.fighterName;
 
   const divB = formButtons(1, ["ACEPTAR"], [
     ()=>{
@@ -1402,7 +1468,7 @@ function formEditState(oFighter, oState, type, fighterCau){
 
   const pFCa = formSeccion(`Causante`);
   pFCa[2].style.height = "0px";
-  const sCau = formSelectFighter("id-select-fighter",FightersList);
+  const sCau = formSelectFighter("id-select-fighter",AppData.combats[AppData.selected].FightersList);
   if (fighterCau!="") sCau[1].value = fighterCau;
   
   const divB = formButtons(1, ["ACEPTAR"], [
@@ -1475,6 +1541,9 @@ function formSelectStateType(oFighter, oState, bNew){
 window.addEventListener("load", ()=>{
   HTMLMain = document.querySelector("main");
   
+  htmlInpNomCo = document.querySelector("#nom-combat");
+  htmlInpNomCo.addEventListener("change", changeCombatTitle);
+  
   loadLocal();
 
   htmlNumTurno = document.querySelector("#num-turno");
@@ -1482,7 +1551,7 @@ window.addEventListener("load", ()=>{
   
   htmlBtnTurno = document.getElementById("btn-next-turn");
   htmlBtnTurno.addEventListener("click", ()=>{ nextFighter() });
-  if (TurnControl.mode===1) htmlBtnTurno.innerHTML = "CONTINUAR"
+  if (AppData.combats[AppData.selected].TurnControl.mode===1) htmlBtnTurno.innerHTML = "CONTINUAR"
 
   htmlStatsData = document.getElementById("stats-data");
   htmlLogoDado  = document.getElementById("id-logo-dado");
@@ -1494,7 +1563,10 @@ window.addEventListener("load", ()=>{
   btnNewCombat.addEventListener("click", newCombat);  
 
   const btnClearCombat = document.getElementById("btn-clear-combat");
-  btnClearCombat.addEventListener("click", clearCombat);
+  btnClearCombat.addEventListener("click", clearCombat);  
+
+  const btnRestartCombat = document.getElementById("btn-restart-combat");
+  btnRestartCombat.addEventListener("click", restartCombat);
   
   updateTurn();
 })

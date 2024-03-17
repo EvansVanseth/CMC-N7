@@ -216,6 +216,15 @@ footer a {
     padding-right: 0;
   }
 }
+.mark-alone {
+  margin-top: 1rem;
+  padding: 0 3rem;
+}
+@media (max-width: 750px) {
+  .mark-alone {
+    padding: 0 1rem;
+  }
+}
 .mark-header {
   display: flex;
   align-items: center;
@@ -247,6 +256,22 @@ footer a {
 }
 .mark-title {
   margin: 0;
+}
+.mark-input {
+  margin: 1rem;
+  width: 100%;
+  padding: .5rem;
+  border: .2rem solid var(--colorPri);
+  border-radius: .5rem;
+  background-color: var(--colorTer);
+  color: var(--colorPri);
+  font-size: 2rem;
+  font-weight: bold;
+}
+@media (max-width: 750px) {
+  .mark-input {
+    font-size: 1.2rem;
+  }
 }
 .mark-icon {
   width: 3rem;
@@ -795,4 +820,37 @@ footer a {
   grid-column: 1 / 5;
   margin: 0;
   font-size: 1.1rem;
+}
+
+/* -------------------------------------------------------- */
+/* PANEL OPTIOONS */
+
+.combat-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.combat-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: .2rem dashed var(--colorPri);
+  padding: 0;
+  margin: .5rem 1rem;
+}
+
+.combat-selected {
+  border-style: solid;
+  background-color: var(--colorTer);
+}
+
+.combat-fila p {
+  margin: 0.2rem;
+  margin-left: 1rem;
+  font-size: 1.4rem;
+  font-size: bold;
+  width: 100%;
+}
+.combat-fila button {
+  margin: 0.2rem;
 }

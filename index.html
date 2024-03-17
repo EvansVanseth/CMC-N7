@@ -22,6 +22,13 @@
     </div>
   </header>
   <main>
+    <!-- Titulo del combate -->
+    <div class="app-mark mark-alone contenedor">
+      <div class="mark-group">
+        <h3 class="mark-title fighters-title">COMBATE</h3>
+        <input type="text" class="mark-input" id="nom-combat"/>
+      </div>
+    </div>
     <!-- Listado de combatientes -->
     <div class="app-mark contenedor">
       <div class="mark-header">
@@ -74,15 +81,19 @@
     <div class="app-mark contenedor">
       <div class="mark-header">
         <div class="mark-group">
-          <h3 class="mark-title">OPCIONES</h3>
+          <h3 class="mark-title">COMBATES</h3>
           <img class="mark-icon" alt="fighters-logo" src="img/icons/setup.svg">
         </div>
       </div>
       <div class="panel-options">
         <div class="mark-group">
           <button class="btn mark-opt-btn" id="btn-new-combat">NUEVO COMBATE</button>
-          <button class="btn mark-opt-btn" id="btn-clear-combat">REINICIAR COMBATE</button>
+          <button class="btn mark-opt-btn" id="btn-clear-combat">VACIAR COMBATE</button>
+          <button class="btn mark-opt-btn" id="btn-restart-combat">REINICIAR COMBATE</button>
         </div>
+      </div>
+      <div class="panel-combats" id="combat-list">
+        <!-- Aqui escrive javascript -->
       </div>
     </div>
   </main>
