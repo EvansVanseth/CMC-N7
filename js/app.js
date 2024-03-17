@@ -83,9 +83,7 @@ function loadLocal(){
     jsonAppData = JSON.parse(localStorage.getItem("cmc-combats"));
       AppData.selected = jsonAppData.selected;
       AppData.combats = []
-      console.log("todos los combates", jsonAppData)
       jsonAppData.combats.forEach((loadedCombat, index) => {
-        console.log(`Combate ${index}`, jsonAppData.combats[index])
         const newCombat = {
           FightersList:  [],
           InitiativeList: [],
@@ -134,7 +132,6 @@ function loadLocal(){
   }
 }
 function changeCombatTitle(){
-  console.log(htmlInpNomCo.value);
   AppData.combats[AppData.selected].TurnControl.nombre = htmlInpNomCo.value;
   updateTurn();
 };
@@ -146,7 +143,6 @@ function updateTurn(){
   } else {
     htmlNumTurno.innerHTML = `${AppData.combats[AppData.selected].TurnControl.turno}`;
   }
-  console.log("actualizamos ventana");
   showFighters();
   showLife();
   showInitiative();
@@ -159,7 +155,6 @@ function findNextFighter(){
     let fighterFind = "";
     if(AppData.combats[AppData.selected].FightersList.length>0) {
       htmlBtnTurno.innerHTML = "SIGUIENTE";
-      console.log(AppData.combats[AppData.selected].TurnControl.mode);
       if(AppData.combats[AppData.selected].TurnControl.mode===0) {
         AppData.combats[AppData.selected].TurnControl.mode = 1;
         AppData.combats[AppData.selected].TurnControl.fighterPos = AppData.combats[AppData.selected].InitiativeList[0].iControlInit;
@@ -192,7 +187,6 @@ function findNextFighter(){
             }
           } while (fighterFind==="");
           AppData.combats[AppData.selected].TurnControl.fighterName = fighterFind;
-          console.log(AppData.combats[AppData.selected].TurnControl.fighterName);
           getFighterByName(AppData.combats[AppData.selected].TurnControl.fighterName).startTurn();
           if (getFighterByName(fighterFind).checkStates()) nextFighter();
       }
@@ -1414,7 +1408,6 @@ function formAddState(oFighter, type){
       divOpac[0].remove();
       const oFighterCau = getFighterByName(sCau[1].value);
       const iInitCau = oFighterCau.iControlInit;
-      console.log(sCau[1].value, iInitCau);
       const newState = new state( type, 
                                   iName[2].value, 
                                   iDesc[2].value, 
