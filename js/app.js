@@ -68,6 +68,9 @@ function selectCombat(index){
 };
 function deleteCombat(index){
   if (AppData.combats.length===1) return;
+  if (!confirm(`Esta acción eliminará el combate.
+  
+  ¿Quieres hacerlo igualmente?`)) return;  
   if (index===AppData.combats.length - 1) 
     AppData.selected = AppData.combats.length - 2;
   AppData.combats.splice(index, 1);
