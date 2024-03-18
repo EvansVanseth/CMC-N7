@@ -23,8 +23,20 @@ let htmlBtnTurno = null;
 let htmlStatsData = null;
 let htmlLogoDado = null;
 function newCombat(){ 
-  AppData.combats.push({...defaultCombat});
-  AppData.selected = AppData.combats.length - 1;
+  const nCombat = {
+    FightersList:  [],
+    InitiativeList: [],
+    LifeList: [],
+    TurnControl: {
+      turno: 0,
+      fighterPos: 999999999,
+      fighterName: "",
+      mode: 0,
+      nombre: "Nuevo combate"
+    }
+  }
+  AppData.combats.push(nCombat);
+  //AppData.selected = AppData.combats.length - 1;
   htmlBtnTurno.innerHTML = "INICIAR";
   updateTurn();
 };
